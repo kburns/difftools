@@ -2,6 +2,7 @@
 
 
 import numpy as np
+import math
 
 
 class Chebyshev(object):
@@ -12,15 +13,12 @@ class Chebyshev(object):
 
         Parameters
         ----------
-        n : int or array
+        n : int
             Degree of Chebyshev polynomial
         x : float or array
             Location for evaluation
 
         """
-
-        if isinstance(n, np.ndarray) and isinstance(x, np.ndarray):
-            x = np.array([x]).T
 
         # Chebyshev polynomials
         t = np.arccos(x)
@@ -36,14 +34,10 @@ class Chebyshev(object):
         ----------
         p : int
             Derivative order
-        n : array of ints
-            Degrees of Chebyshev polynomial
-        x : array of floats
-            Locations for evaluation
-
-        Returns
-        -------
-        d[i, j] : Derivative of T_n[j] at position x[i]
+        n : int
+            Degree of Chebyshev polynomial
+        x : float or array
+            Location for evaluation
 
         """
 
@@ -55,16 +49,12 @@ class Chebyshev(object):
                 return self._interior_derivative(p, n, x)
         else:
             if (x[0] in (-1., 1.)) or (x[-1] in (-1., 1.)):
-                first = [self.derivative(p, n, x[0])]
+                first = self.derivative(p, n, x[0])
                 mid = self.derivative(p, n, x[1:-1])
-                last = [self.derivative(p, n, x[-1])]
-                return np.concatenate((first, mid, last))
+                last = self.derivative(p, n, x[-1])
+                return np.concatenate(([first], mid, [last]))
             else:
-                if np.isscalar(n):
-                    return self._interior_derivative(p, n, x)
-                else:
-                    x_vert = np.array([x]).T
-                    return self._interior_derivative(p, n, x_vert)
+                return self._interior_derivative(p, n, x)
 
     def _interior_derivative(self, p, n, x):
 
