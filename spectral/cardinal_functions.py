@@ -1,6 +1,8 @@
+"""Spectral cardinal functions and grids."""
 
 
 import numpy as np
+from basis_functions import Chebyshev
 
 
 class ChebyshevExtrema(object):
@@ -9,6 +11,9 @@ class ChebyshevExtrema(object):
 
         # Store inputs
         self.N = N
+
+        # Connect to basis functions
+        self.basis = Chebyshev()
 
     def grid(self):
 
@@ -19,7 +24,30 @@ class ChebyshevExtrema(object):
 
         return self._grid
 
-    def cardinal
+    def evaluate(self, j, x):
+        """
+        Evaluate Chebyshev polynomials.
+
+        Parameters
+        ----------
+        j : int
+            Degree of Chebyshev polynomial
+        x : float or array
+            Locations for evaluation
+
+        """
+
+        m = np.arange(self.N + 1)
+        Tm_xj = self.basis.evaluate(m, self.grid()[j])
+        Tm_x = self.basis.evaluate(m, x)
+
+
+
+        t = np.arccos(x)
+        Tn = np.cos(n * t)
+
+        return Tn
+
 
 class ChebyshevRoots(object):
 
@@ -36,8 +64,4 @@ class ChebyshevRoots(object):
             self._grid = x
 
         return self._grid
-
-
-
-
 
