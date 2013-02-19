@@ -14,9 +14,14 @@ class BoundaryValueProblem(object):
 
     def __init__(self, varlist):
         """
-        Solve boundary value problem:
+        Setup the boundary value problem
 
             LHS . u = RHS
+
+        Parameters
+        ----------
+        varlist : list of series objects
+            Variables in system.
 
         """
 
@@ -29,6 +34,7 @@ class BoundaryValueProblem(object):
         self.RHS = np.zeros(self.syssize)
 
     def solve(self):
+        """Solve the bvp using a matrix solve."""
 
         # Matrix solve
         u = linalg.solve(a=self.LHS, b=self.RHS)
@@ -40,9 +46,14 @@ class EigenProblem(object):
 
     def __init__(self, varlist):
         """
-        Solve eigenvalue problem
+        Setup the eigenvalue problem
 
             LHS . u = eigval * RHS . u
+
+        Parameters
+        ----------
+        varlist : list of series objects
+            Variables in system.
 
         """
 
@@ -55,6 +66,7 @@ class EigenProblem(object):
         self.RHS = np.identity(self.syssize)
 
     def solve(self):
+        """Solve the generalized eigenproblem."""
 
         # Compute eigenvalues and eigenvectors
         eigvals, eigvecs = linalg.eig(a=self.LHS, b=self.RHS)

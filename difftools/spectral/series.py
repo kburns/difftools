@@ -1,3 +1,9 @@
+"""
+Series representations.
+
+Author: Keaton J. Burns <keaton.burns@gmail.com>
+
+"""
 
 
 import numpy as np
@@ -11,6 +17,13 @@ class TruncatedSeries(object):
 
         self.size = self.basis.size
         self.coefficients = np.zeros(self.size)
+
+    def __call__(self, function):
+
+        LHS = self.basis.evalmatrix()
+        RHS = f(self.basis.grid)
+
+        self.coefficients[:] = linalg.solve(a=LHS, b=RHS)
 
     def evaluate(self, x, index=False):
 
@@ -30,9 +43,3 @@ class TruncatedSeries(object):
 
         return out
 
-    def _set_to_grid_function(self, f):
-
-        LHS = self.basis.evalmatrix()
-        RHS = f(self.basis.grid)
-
-        self.coefficients[:] = linalg.solve(a=LHS, b=RHS)
