@@ -1,0 +1,43 @@
+
+
+basis: set of N functions defined over the interval [-1, 1]
+
+cardinal functions: legandre polynomials definied over a specified grid
+
+series: a representation of a function over the interval [-1, 1]. Consists of
+    a basis and an array of coefficients.
+
+
+
+
+******************
+Ideal API examples
+******************
+
+
+
+
+import numpy as np
+from difftools.public import *
+
+
+basis = ChebyshevExtremaCardinals(50)
+y = TruncatedSeries(basis)
+EP = EigenProblem([y])
+
+EP.add_to_LHS(y, y, basis.diffmatrix(2))
+
+EP.set_boundary_condition(u, 'left', 'dirichlet', 0.)
+EP.set_boundary_condition(u, 'right', 'dirichlet', 0.)
+EP.implement_boundary_bordering()
+
+EP.eigval_convertor = lambda w: math.sqrt(-w)
+
+eigvals, eigfuncs = EP.solve()
+
+
+
+*****
+
+f = lambda x: 1. - x**2
+f = TruncatedSeries(basis)(f)

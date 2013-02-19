@@ -1,4 +1,9 @@
-"""Spectral basis functions."""
+"""
+Utility classes defining spectral basis functions.
+
+Author: Keaton J. Burns <keaton.burns@gmail.com>
+
+"""
 
 
 import numpy as np
@@ -7,6 +12,7 @@ import math
 
 class Chebyshev(object):
 
+    @staticmethod
     def evaluate(self, n, x):
         """
         Evaluate Chebyshev polynomials.
@@ -26,6 +32,7 @@ class Chebyshev(object):
 
         return Tn
 
+    @staticmethod
     def derivative(self, p, n, x):
         """
         Evaluate derivatives of Chebyshev polynomials.
@@ -56,6 +63,7 @@ class Chebyshev(object):
             else:
                 return self._interior_derivative(p, n, x)
 
+    @staticmethod
     def _interior_derivative(self, p, n, x):
 
         # Compute simple arrays
@@ -92,6 +100,7 @@ class Chebyshev(object):
         # Higher derivatives
         raise ValueError("Higher order derivatives not implemented.")
 
+    @staticmethod
     def _endpoint_derivative(self, p, n, x):
 
         C = 1.

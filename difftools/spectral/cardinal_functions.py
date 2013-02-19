@@ -1,38 +1,65 @@
-"""Spectral cardinal functions and grids."""
+"""
+Spectral cardinal functions and grids.
+
+Author: Keaton J. Burns <keaton.burns@gmail.com>
+
+"""
 
 
 import numpy as np
 import basis_functions
 
 
-class ChebyshevExtrema(object):
+class CardinalBase(object):
+    """Base class for cardinal bases."""
 
-    def __init__(self, N):
+    def __init__(self, size, functions):
         """
-        Chebysehv polynomials: interior or "roots" grid.
+        Construct basis object.
 
         Parameters
         ----------
-        N : int
+        size : int
             Number of points in grid.
 
         """
 
         # Store inputs
-        self.N = N
-
-        # Connect to basis functions
-        self.basis = basis_functions.Chebyshev()
+        self.size = size
+        self.functions = functions
 
         # Construct grid
         self.grid = self._construct_grid()
 
     def _construct_grid(self):
 
-        i = np.arange(self.N + 1)
-        x = np.cos(np.pi * i / self.N)
+        pass
 
-        return x
+    def _construct_diff_matrix(self, p):
+
+        D = np.empty((self.size, self.size))
+        for i in xrange(self.size):
+            for j in xrange(self.size):
+                D[i, j] = self.derivative(p, j, i)
+
+        return D
+
+    def derivative(self, p, j, i):
+
+        pass
+
+    def diffmatrix(self, p):
+        """
+        Construct p-th order differentiation matrix.
+
+        Parameters
+        ----------
+        p : int
+            Derivative order
+
+        """
+
+        return self._construct_diff_matrix(p)
 
     def evaluate(self, j, i):
         """
@@ -41,7 +68,7 @@ class ChebyshevExtrema(object):
         Parameters
         ----------
         j : int
-            Degree / basis index
+            Basis index
         i : int
             Grid index
 
@@ -51,6 +78,20 @@ class ChebyshevExtrema(object):
             return 1.
         else:
             return 0.
+
+
+class ChebyshevExtrema(CardinalBase):
+    """Chebysehv polynomials: extrema & endpoints ("Gauss-Lobatto") grid."""
+
+    basis = basis_functions.Chebyshev
+
+    def _construct_grid(self):
+
+        self.N = self.size - 1
+        i = np.arange(self.N + 1)
+        x = np.cos(np.pi * i / self.N)
+
+        return x
 
     def derivative(self, p, j, i):
         """
@@ -103,22 +144,10 @@ class ChebyshevExtrema(object):
 
         """
 
-        N = self.N
-
-        # First derivative
-        if not hasattr(self, '_D1'):
-            D1 = np.empty((N + 1, N + 1))
-            for i in xrange(N + 1):
-                for j in xrange(N + 1):
-                    D1[i, j] = self.derivative(1, j, i)
-            self._D1 = D1
-        if p == 1:
-            return self._D1
-
-        # Higher derivatives
-        Dp = np.identity(N + 1)
+        D1 = self._construct_diff_matrix(1)
+        Dp = np.identity(self.size)
         for i in xrange(p):
-            Dp = np.dot(self._D1, Dp)
+            Dp = np.dot(D1, Dp)
         return Dp
 
     def evaluate_off_grid(self, j, x):
@@ -160,26 +189,9 @@ class ChebyshevExtrema(object):
 
 
 class ChebyshevRoots(object):
+    """Chebysehv polynomials: interior or "roots" grid."""
 
-    def __init__(self, N):
-        """
-        Chebysehv polynomials: interior or "roots" grid.
-
-        Parameters
-        ----------
-        N : int
-            Number of points in grid.
-
-        """
-
-        # Store inputs
-        self.N = N
-
-        # Connect to basis functions
-        self.basis = basis_functions.Chebyshev()
-
-        # Construct grid
-        self.grid = self._construct_grid()
+    basis = basis_functions.Chebyshev
 
     def _construct_grid(self):
 
@@ -187,24 +199,6 @@ class ChebyshevRoots(object):
         x = np.cos(np.pi * (2.*i + 1.) / (2.*self.N))
 
         return x
-
-    def evaluate(self, j, i):
-        """
-        Evaluate Cardinal functions on the grid: Cj(xi).
-
-        Parameters
-        ----------
-        j : int
-            Degree / basis index
-        i : int
-            Grid index
-
-        """
-
-        if i == j:
-            return 1.
-        else:
-            return 0.
 
     def derivative(self, p, j, i):
         """
@@ -241,42 +235,6 @@ class ChebyshevRoots(object):
             Cj_xx = Cj_x * (xi / (1. - xi**2) - 2. / (xi - xj))
         if p == 2:
             return Cj_xx
-
-        # Higher derivatives
-        raise ValueError("Higher order derivatives not implemented.")
-
-    def diffmatrix(self, p):
-        """
-        Construct p-th order differentiation matrix.
-
-        Parameters
-        ----------
-        p : int
-            Derivative order
-
-        """
-
-        N = self.N
-
-        # First derivative
-        if not hasattr(self, '_D1'):
-            D1 = np.empty((N, N))
-            for i in xrange(N):
-                for j in xrange(N):
-                    D1[i, j] = self.derivative(1, j, i)
-            self._D1 = D1
-        if p == 1:
-            return self._D1
-
-        # Second derivative
-        if not hasattr(self, '_D2'):
-            D2 = np.empty((N, N))
-            for i in xrange(N):
-                for j in xrange(N):
-                    D2[i, j] = self.derivative(2, j, i)
-            self._D2 = D2
-        if p == 2:
-            return self._D2
 
         # Higher derivatives
         raise ValueError("Higher order derivatives not implemented.")

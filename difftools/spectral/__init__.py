@@ -1,5 +1,11 @@
+"""
+Initialization file for spectral tools.
+
+Author: Keaton J. Burns <keaton.burns@gmail.com>
+
+"""
 
 
-import basis_functions
-import cardinal_functions
+import bases
+import series
 
