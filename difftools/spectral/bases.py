@@ -31,7 +31,7 @@ class _BasisBase(object):
         E = np.empty((self.size, self.size))
         for i in xrange(self.size):
             for j in xrange(self.size):
-                E[i, j] = self.evaluate(p, j, i, index=True)
+                E[i, j] = self.evaluate(j, i, index=True)
 
         return E
 
