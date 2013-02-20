@@ -34,7 +34,7 @@ class BoundaryValueProblem(object):
         self.RHS = np.zeros(self.syssize)
 
     def solve(self):
-        """Solve the bvp using a matrix solve."""
+        """Solve the BVP using a matrix solve."""
 
         # Matrix solve
         u = linalg.solve(a=self.LHS, b=self.RHS)
