@@ -71,10 +71,10 @@ class _ChebyshevPolynomialBase(_BasisBase):
         ----------
         j : int
             Basis element index
-        x : float, int, or array
-            Location / grid index for evaluation
+        x : array of floats / ints
+            Locations / grid indeces for evaluation
         index : bool
-            True if x is a grid index.
+            True if x represents grid indeces.
 
         """
 
@@ -98,10 +98,10 @@ class _ChebyshevPolynomialBase(_BasisBase):
             Derivative order
         j : int
             Basis element index
-        x : float, int, or array
-            Location / grid index for evaluation
+        x : array of floats / ints
+            Locations / grid indeces for evaluation
         index : bool
-            True if x is a grid index.
+            True if x represents grid indeces.
 
         """
 

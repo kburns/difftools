@@ -37,19 +37,17 @@ class TruncatedSeries(object):
 
         Parameters
         ----------
-        x : float, int, or array
-            Location / grid index for evaluation
+        x : array of floats / ints
+            Locations / grid indeces for evaluation
         index : bool
-            True if x is a grid index.
+            True if x represents grid indeces.
 
         """
 
         # Add terms in series
-        # VECTORIZE
-        scratch = np.empty(self.size)
+        out = np.zeros(x.size)
         for j in xrange(self.size):
-            scratch[j] = self.basis.evaluate(j, x, index=index)
-        out = np.dot(scratch, self.coefficients)
+            out += self.basis.evaluate(j, x, index=index) * self.coefficients[j]
 
         return out
 
@@ -61,19 +59,17 @@ class TruncatedSeries(object):
         ----------
         p : int
             Derivative order
-        x : float, int, or array
-            Location / grid index for evaluation
+        x : array of floats / ints
+            Locations / grid indeces for evaluation
         index : bool
-            True if x is a grid index.
+            True if x represents grid indeces.
 
         """
 
         # Add terms in series
-        # VECTORIZE
-        scratch = np.empty(self.size)
+        out = np.zeros(x.size)
         for j in xrange(self.size):
-            scratch[j] = self.basis.derivative(p, j, x, index=index)
-        out = np.dot(scratch, self.coefficients)
+            out += self.basis.derivative(p, j, x, index=index) * self.coefficients[j]
 
         return out
 
