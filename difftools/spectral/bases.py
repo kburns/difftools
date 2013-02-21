@@ -1,3 +1,9 @@
+"""
+Basis sets.
+
+Author: Keaton J. Burns <keaton.burns@gmail.com>
+
+"""
 
 
 import numpy as np
@@ -5,13 +11,28 @@ import math
 
 
 class _BasisBase(object):
+    """Basis base class."""
 
     def __init__(self, size):
+        """
+        An object defining evaluation and derivatives in a spectral basis.
 
+        Parameters
+        ----------
+        size : int
+            Number of elements to include in the basis.
+
+        """
+
+        # Store inputs
         self.size = size
+
+        # Construct collocation grid
         self._construct_grid()
 
     def _construct_diff_matrix(self, p):
+        # VECTORIZE
+        # DEPRICATE?
 
         Dp = np.empty((self.size, self.size))
         for i in xrange(self.size):
@@ -21,12 +42,15 @@ class _BasisBase(object):
         return Dp
 
     def diffmatrix(self, p):
+        # DEPRICATE?
 
         Dp = self._construct_diff_matrix(p)
 
         return Dp
 
     def evalmatrix(self):
+        # VECTORIZE
+        # DEPRICATE?
 
         E = np.empty((self.size, self.size))
         for i in xrange(self.size):
@@ -37,39 +61,56 @@ class _BasisBase(object):
 
 
 class _ChebyshevPolynomialBase(_BasisBase):
+    """Chebyshev polynomial basis base class."""
 
     def evaluate(self, j, x, index=False):
         """
+        Evaluate a basis element.
+
+        Parameters
+        ----------
         j : int
-            Degree of Chebyshev polynomial
-        x : float
-            Location for evaluation
+            Basis element index
+        x : float, int, or array
+            Location / grid index for evaluation
+        index : bool
+            True if x is a grid index.
 
         """
 
+        # Fetch grid points
         if index:
             x = self.grid[x]
 
         # Chebyshev polynomials
-        t = math.acos(x)
-        Tj = math.cos(j * t)
+        t = np.arccos(x)
+        Tj = np.cos(j * t)
 
         return Tj
 
     def derivative(self, p, j, x, index=False):
         """
+        Evaluate derivatives of a basis element.
+
+        Parameters
+        ----------
         p : int
             Derivative order
         j : int
-            Degree of Chebyshev polynomial
-        x : float
-            Location for evaluation
+            Basis element index
+        x : float, int, or array
+            Location / grid index for evaluation
+        index : bool
+            True if x is a grid index.
 
         """
 
+        # Fetch grid points
         if index:
             x = self.grid[x]
 
+        # Split interior and exterior derivatives
+        # VECTORIZE
         if x in (-1., 1.):
             return self._endpoint_derivative(p, j, x)
         else:
@@ -78,11 +119,11 @@ class _ChebyshevPolynomialBase(_BasisBase):
     def _interior_derivative(self, p, j, x):
 
         # Compute simple arrays
-        t = math.acos(x)
+        t = np.arccos(x)
         cos_t = x
-        sin_t = math.sin(t)
-        cos_jt = math.cos(j * t)
-        sin_jt = math.sin(j * t)
+        sin_t = np.sin(t)
+        cos_jt = np.cos(j * t)
+        sin_jt = np.sin(j * t)
 
         # Chebyshev polynomials
         Tj = cos_jt
@@ -113,6 +154,7 @@ class _ChebyshevPolynomialBase(_BasisBase):
 
     def _endpoint_derivative(self, p, j, x):
 
+        # p-th derivative
         C = 1.
         for k in xrange(p):
             C *= (j**2 - k**2) / (2.*k + 1.)
@@ -122,6 +164,7 @@ class _ChebyshevPolynomialBase(_BasisBase):
 
 
 class ChebyshevExtremaPolynomials(_ChebyshevPolynomialBase):
+    """Chebyshev polynomial basis on the extrema & endpoints grid."""
 
     def _construct_grid(self):
 
@@ -131,6 +174,7 @@ class ChebyshevExtremaPolynomials(_ChebyshevPolynomialBase):
 
 
 class ChebyshevRootsPolynomials(_ChebyshevPolynomialBase):
+    """Chebyshev polynomial basis on the roots grid."""
 
     def _construct_grid(self):
 

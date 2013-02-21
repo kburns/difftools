@@ -11,6 +11,7 @@ import scipy.linalg as linalg
 
 
 class BoundaryValueProblem(object):
+    """Linear boundary value problem solver."""
 
     def __init__(self, varlist):
         """
@@ -43,6 +44,7 @@ class BoundaryValueProblem(object):
 
 
 class EigenProblem(object):
+    """Linear eigenproblem solver."""
 
     def __init__(self, varlist):
         """
@@ -72,7 +74,7 @@ class EigenProblem(object):
         eigvals, eigvecs = linalg.eig(a=self.LHS, b=self.RHS)
 
         # Sort by eigenvalue
-        sorter = np.argsort(eigvals)
+        sorter = np.argsort(np.abs(eigvals))
         eigvals = eigvals[sorter]
         eigvecs = eigvecs[:, sorter].T
 

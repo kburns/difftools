@@ -11,15 +11,16 @@ import scipy.linalg as linalg
 
 
 class TruncatedSeries(object):
+    """Truncated series class."""
 
     def __init__(self, basis):
         """
-        Create a truncated series representation of a function.
+        An object representing a function as a truncated series.
 
         Parameters
         ----------
         basis : basis object
-            Finite basis for representation
+            Spectral basis for representation
 
         """
 
@@ -36,10 +37,10 @@ class TruncatedSeries(object):
 
         Parameters
         ----------
-        x : float or int
-            Location or grid index for evaluation
+        x : float, int, or array
+            Location / grid index for evaluation
         index : bool
-            True if x is grid index, False if x is location.
+            True if x is a grid index.
 
         """
 
@@ -54,16 +55,16 @@ class TruncatedSeries(object):
 
     def derivative(self, p, x, index=False):
         """
-        Evaluate derivative of series.
+        Evaluate derivatives of series.
 
         Parameters
         ----------
         p : int
             Derivative order
-        x : float or int
-            Location or grid index for evaluation
+        x : float, int, or array
+            Location / grid index for evaluation
         index : bool
-            True if x is grid index, False if x is location.
+            True if x is a grid index.
 
         """
 

@@ -16,6 +16,7 @@ y = TruncatedSeries(basis)
 EP = EigenProblem([y])
 
 # EP.add_to_LHS(y, y, basis.diffmatrix(2))
+# -or- EP.add_to_LHS(v, p, )
 # EP.set_boundary_condition(u, 'left', 'dirichlet', 0.)
 # EP.set_boundary_condition(u, 'right', 'dirichlet', 0.)
 # EP.implement_boundary_bordering()
@@ -32,3 +33,4 @@ EP.RHS[-1, :] = 0.
 eigvals, eigfuncs = EP.solve()
 
 L = np.sqrt(-eigvals)
+

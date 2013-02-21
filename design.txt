@@ -1,6 +1,7 @@
 
 
-basis: set of N functions defined over the interval [-1, 1]
+basis: set of functions defined over the interval [-1, 1]
+    -a cardinal basis is grid dependant: requires a grid
 
 cardinal functions: legandre polynomials definied over a specified grid
 
