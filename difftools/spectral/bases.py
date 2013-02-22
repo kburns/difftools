@@ -31,15 +31,13 @@ class _BasisBase(object):
         self._construct_grid()
 
     def _construct_diff_matrix(self, p):
-        # VECTORIZE
         # DEPRICATE?
 
         Dp = np.empty((self.size, self.size))
-        for i in xrange(self.size):
-            for j in xrange(self.size):
-                Dp[i, j] = self.derivative(p, j, i, index=True)
+        for j in xrange(self.size):
+            Dp[j] = self.derivative(p, j, self.grid)
 
-        return Dp
+        return Dp.T
 
     def diffmatrix(self, p):
         # DEPRICATE?
@@ -49,15 +47,13 @@ class _BasisBase(object):
         return Dp
 
     def evalmatrix(self):
-        # VECTORIZE
         # DEPRICATE?
 
         E = np.empty((self.size, self.size))
-        for i in xrange(self.size):
-            for j in xrange(self.size):
-                E[i, j] = self.evaluate(j, i, index=True)
+        for j in xrange(self.size):
+            E[j] = self.evaluate(j, self.grid)
 
-        return E
+        return E.T
 
 
 class _ChebyshevPolynomialBase(_BasisBase):
@@ -110,11 +106,12 @@ class _ChebyshevPolynomialBase(_BasisBase):
             x = self.grid[x]
 
         # Split interior and exterior derivatives
-        # VECTORIZE
-        if x in (-1., 1.):
-            return self._endpoint_derivative(p, j, x)
-        else:
-            return self._interior_derivative(p, j, x)
+        endpts = np.abs(x) == 1.
+        Tj_xp = np.empty_like(x)
+        Tj_xp[endpts] = self._endpoint_derivative(p, j, x[endpts])
+        Tj_xp[~endpts] = self._interior_derivative(p, j, x[~endpts])
+
+        return Tj_xp
 
     def _interior_derivative(self, p, j, x):
 

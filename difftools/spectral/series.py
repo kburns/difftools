@@ -45,7 +45,7 @@ class TruncatedSeries(object):
         """
 
         # Add terms in series
-        out = np.zeros(x.size)
+        out = np.zeros_like(x)
         for j in xrange(self.size):
             out += self.basis.evaluate(j, x, index=index) * self.coefficients[j]
 
@@ -67,7 +67,7 @@ class TruncatedSeries(object):
         """
 
         # Add terms in series
-        out = np.zeros(x.size)
+        out = np.zeros_like(x)
         for j in xrange(self.size):
             out += self.basis.derivative(p, j, x, index=index) * self.coefficients[j]
 
