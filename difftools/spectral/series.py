@@ -80,7 +80,7 @@ class TruncatedSeries(object):
 
         """
 
-        LHS = self.basis.evalmatrix()
+        LHS = self.basis.evalmatrix(self.basis.grid)
         RHS = f(self.basis.grid)
 
         self.coefficients[:] = linalg.solve(a=LHS, b=RHS)

@@ -29,15 +29,15 @@ class _BasisBase(object):
         # Construct collocation grid
         self.grid = self._construct_grid()
 
-    def _construct_diff_matrix(self, p):
+    def _construct_diff_matrix(self, p, x):
 
-        Dp = np.empty((self.size, self.size))
+        Dp = np.empty((self.size, x.size))
         for j in xrange(self.size):
-            Dp[j] = self.derivative(p, j, self.grid)
+            Dp[j] = self.derivative(p, j, x)
 
         return Dp.T
 
-    def diffmatrix(self, p):
+    def diffmatrix(self, p, x):
         """
         Construct p-th order differentiation matrix.
 
@@ -45,17 +45,27 @@ class _BasisBase(object):
         ----------
         p : int
             Derivative order
+        x : array of floats
+            Locations for evaluation
 
         """
 
-        return self._construct_diff_matrix(p)
+        return self._construct_diff_matrix(p, x)
 
-    def evalmatrix(self):
-        """Construct evaluation matrix."""
+    def evalmatrix(self, x):
+        """
+        Construct evaluation matrix.
 
-        E = np.empty((self.size, self.size))
+        Parameters
+        ----------
+        x : array of floats
+            Locations for evaluation
+
+        """
+
+        E = np.empty((self.size, x.size))
         for j in xrange(self.size):
-            E[j] = self.evaluate(j, self.grid)
+            E[j] = self.evaluate(j, x)
 
         return E.T
 
@@ -175,6 +185,7 @@ class ChebyshevRootsPolynomials(_ChebyshevPolynomialBase):
 
         return x
 
+
 class _CardinalBase(_BasisBase):
     """Chebyshev cardinal basis base class."""
 
@@ -290,7 +301,7 @@ class ChebyshevExtremaCardinals(_CardinalBase):
 
         return Cj_x
 
-    def diffmatrix(self, p):
+    def diffmatrix(self, p, x):
         """
         Construct p-th order differentiation matrix.
 
@@ -302,7 +313,7 @@ class ChebyshevExtremaCardinals(_CardinalBase):
         """
 
         # Construct higher derivative matrices through matrix multiplication
-        D1 = self._construct_diff_matrix(1)
+        D1 = self._construct_diff_matrix(1, x)
         Dp = np.identity(self.size)
         for i in xrange(p):
             Dp = np.dot(D1, Dp)

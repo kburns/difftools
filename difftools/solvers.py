@@ -17,19 +17,40 @@ class _ProblemBase(object):
 
         # Store inputs
         self.varlist = varlist
-        self.syssize = np.sum([var.size for var in self.varlist])
 
-        # Copy variable coefficients
+        # Get start indeces and system size
+        self.varstart = {}
+        self.syssize = 0
+        for var in self.varlist:
+            self.varstart[var] = self.syssize
+            self.syssize += var.size
+
+        # Copy variable coefficients to system array
         self.syscoeff = np.concatenate([var.coefficients for var in self.varlist])
 
-        # Make variable attributes views into the problem vector
-        start = 0
+        # Make variable attributes views into the system array
         for var in self.varlist:
-            var.coefficients = self.syscoeff[start:start+var.size]
-            start += var.size
+            S = self.varstart[var]
+            N = var.size
+            var.coefficients = self.syscoeff[S:S+N]
+
+    def add_to_LHS(self, var1, var2, array):
+        """
+        var1        evaluation on var1 grid
+        var2        evaluation of var2 basis
+        array       array to add
+
+        """
+
+        S1 = self.varstart[var1]
+        S2 = self.varstart[var2]
+        N1 = var1.size
+        N2 = var2.size
+
+        self.LHS[S1:S1+N1, S2:S2+N2] += array
 
 
-class BoundaryValueProblem(object):
+class BoundaryValueProblem(_ProblemBase):
     """Linear boundary value problem solver."""
 
     def __init__(self, varlist):
@@ -61,7 +82,7 @@ class BoundaryValueProblem(object):
         return self.varlist
 
 
-class EigenProblem(object):
+class EigenProblem(_ProblemBase):
     """Linear eigenproblem solver."""
 
     def __init__(self, varlist):
