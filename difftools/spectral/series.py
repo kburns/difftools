@@ -31,27 +31,25 @@ class TruncatedSeries(object):
         self.size = self.basis.size
         self.coefficients = np.zeros(self.size)
 
-    def evaluate(self, x, index=False):
+    def evaluate(self, x):
         """
         Evaluate series.
 
         Parameters
         ----------
-        x : array of floats / ints
-            Locations / grid indeces for evaluation
-        index : bool
-            True if x represents grid indeces.
+        x : array of floats
+            Locations for evaluation
 
         """
 
         # Add terms in series
         out = np.zeros_like(x)
         for j in xrange(self.size):
-            out += self.basis.evaluate(j, x, index=index) * self.coefficients[j]
+            out += self.basis.evaluate(j, x) * self.coefficients[j]
 
         return out
 
-    def derivative(self, p, x, index=False):
+    def derivative(self, p, x):
         """
         Evaluate derivatives of series.
 
@@ -59,17 +57,15 @@ class TruncatedSeries(object):
         ----------
         p : int
             Derivative order
-        x : array of floats / ints
-            Locations / grid indeces for evaluation
-        index : bool
-            True if x represents grid indeces.
+        x : array of floats
+            Locations for evaluation
 
         """
 
         # Add terms in series
         out = np.zeros_like(x)
         for j in xrange(self.size):
-            out += self.basis.derivative(p, j, x, index=index) * self.coefficients[j]
+            out += self.basis.derivative(p, j, x) * self.coefficients[j]
 
         return out
 

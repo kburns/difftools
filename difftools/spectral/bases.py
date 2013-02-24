@@ -7,7 +7,6 @@ Author: Keaton J. Burns <keaton.burns@gmail.com>
 
 
 import numpy as np
-import math
 
 
 class _BasisBase(object):
@@ -28,10 +27,9 @@ class _BasisBase(object):
         self.size = size
 
         # Construct collocation grid
-        self._construct_grid()
+        self.grid = self._construct_grid()
 
     def _construct_diff_matrix(self, p):
-        # DEPRICATE?
 
         Dp = np.empty((self.size, self.size))
         for j in xrange(self.size):
@@ -40,14 +38,20 @@ class _BasisBase(object):
         return Dp.T
 
     def diffmatrix(self, p):
-        # DEPRICATE?
+        """
+        Construct p-th order differentiation matrix.
 
-        Dp = self._construct_diff_matrix(p)
+        Parameters
+        ----------
+        p : int
+            Derivative order
 
-        return Dp
+        """
+
+        return self._construct_diff_matrix(p)
 
     def evalmatrix(self):
-        # DEPRICATE?
+        """Construct evaluation matrix."""
 
         E = np.empty((self.size, self.size))
         for j in xrange(self.size):
@@ -59,7 +63,7 @@ class _BasisBase(object):
 class _ChebyshevPolynomialBase(_BasisBase):
     """Chebyshev polynomial basis base class."""
 
-    def evaluate(self, j, x, index=False):
+    def evaluate(self, j, x):
         """
         Evaluate a basis element.
 
@@ -67,16 +71,10 @@ class _ChebyshevPolynomialBase(_BasisBase):
         ----------
         j : int
             Basis element index
-        x : array of floats / ints
-            Locations / grid indeces for evaluation
-        index : bool
-            True if x represents grid indeces.
+        x : array of floats
+            Locations for evaluation
 
         """
-
-        # Fetch grid points
-        if index:
-            x = self.grid[x]
 
         # Chebyshev polynomials
         t = np.arccos(x)
@@ -84,7 +82,7 @@ class _ChebyshevPolynomialBase(_BasisBase):
 
         return Tj
 
-    def derivative(self, p, j, x, index=False):
+    def derivative(self, p, j, x):
         """
         Evaluate derivatives of a basis element.
 
@@ -94,19 +92,13 @@ class _ChebyshevPolynomialBase(_BasisBase):
             Derivative order
         j : int
             Basis element index
-        x : array of floats / ints
-            Locations / grid indeces for evaluation
-        index : bool
-            True if x represents grid indeces.
+        x : array of floats
+            Locations for evaluation
 
         """
 
-        # Fetch grid points
-        if index:
-            x = self.grid[x]
-
         # Split interior and exterior derivatives
-        endpts = np.abs(x) == 1.
+        endpts = (np.abs(x) == 1.)
         Tj_xp = np.empty_like(x)
         Tj_xp[endpts] = self._endpoint_derivative(p, j, x[endpts])
         Tj_xp[~endpts] = self._interior_derivative(p, j, x[~endpts])
@@ -165,9 +157,11 @@ class ChebyshevExtremaPolynomials(_ChebyshevPolynomialBase):
 
     def _construct_grid(self):
 
-        self.N = self.size - 1
-        i = np.arange(self.N + 1)
-        self.grid = np.cos(np.pi * i / self.N)
+        N = self.size - 1
+        i = np.arange(N + 1)
+        x = np.cos(np.pi * i / N)
+
+        return x
 
 
 class ChebyshevRootsPolynomials(_ChebyshevPolynomialBase):
@@ -175,116 +169,209 @@ class ChebyshevRootsPolynomials(_ChebyshevPolynomialBase):
 
     def _construct_grid(self):
 
-        self.N = self.size
-        i = np.arange(self.N)
-        self.grid = np.cos(np.pi * (2.*i + 1.) / (2.*self.N))
+        N = self.size
+        i = np.arange(N)
+        x = np.cos(np.pi * (2.*i + 1.) / (2.*N))
 
+        return x
 
-class ChebyshevExtremaCardinals(ChebyshevExtremaPolynomials):
+class _CardinalBase(_BasisBase):
+    """Chebyshev cardinal basis base class."""
 
-    def _poly_evaluate(self, *args, **kwargs):
-
-        return ChebyshevExtremaPolynomials.evaluate(self, *args, **kwargs)
-
-    def _poly_derivative(self, *args, **kwargs):
-
-        return ChebyshevExtremaPolynomials.derivative(self, *args, **kwargs)
-
-    def evaluate(self, j, x, index=False):
+    def __init__(self, size):
         """
-        Evaluate Cardinal functions off the grid: Cj(x).
+        An object defining evaluation and derivatives in a spectral basis.
+
+        Parameters
+        ----------
+        size : int
+            Number of elements to include in the basis.
+
+        """
+
+        # Store inputs
+        self.size = size
+
+        # Construct poly basis object
+        self.poly_basis = self._poly_basis_class(size)
+
+        # Construct collocation grid
+        self.grid = self.poly_basis._construct_grid()
+
+    def evaluate(self, j, x):
+        """
+        Evaluate a basis element.
 
         Parameters
         ----------
         j : int
-            Degree of Chebyshev polynomial
-        x : float
-            Location for evaluation
+            Basis element index
+        x : array of floats
+            Locations for evaluation
 
         """
 
-        # Index case
-        if index:
-            if x == j:
-                return 1.
-            else:
-                return 0.
-
-        # Position case
-        N = self.N
-        xj = self.grid[j]
-
-        if x in self.grid:
-            if x == xj:
-                Cj = 1.
-            else:
-                Cj = 0.
-        else:
+        if x is self.grid:
             Cj = np.zeros_like(x)
-            for m in xrange(N + 1):
-                Tm_xj = self._poly_evaluate(m, xj, index=False)
-                Tm_x = self._poly_evaluate(m, x, index=False)
-                if (m == 0) or (m == N):
-                    Cj += Tm_xj * Tm_x / 2.
-                else:
-                    Cj += Tm_xj * Tm_x
-            if (j == 0) or (j == N):
-                Cj *= 1. / N
-            else:
-                Cj *= 2. / N
+            Cj[j] = 1.
+        else:
+            Cj = self._evaluate_off_grid(j, x)
 
         return Cj
 
-    def derivative(self, p, j, x, index=False):
+
+class ChebyshevExtremaCardinals(_CardinalBase):
+    """Chebyshev cardinal basis on the extrema & endpoints grid."""
+
+    _poly_basis_class = ChebyshevExtremaPolynomials
+
+    def _evaluate_off_grid(self, j ,x):
+
+        Cj = np.zeros_like(x)
+        xj = self.grid[j]
+        N = self.size - 1
+
+        for m in xrange(N + 1):
+            Tm_xj = self.poly_basis.evaluate(m, xj)
+            Tm_x = self.poly_basis.evaluate(m, x)
+            if (m == 0) or (m == N):
+                Cj += Tm_xj * Tm_x / 2.
+            else:
+                Cj += Tm_xj * Tm_x
+
+        if (j == 0) or (j == N):
+            Cj *= 1. / N
+        else:
+            Cj *= 2. / N
+
+        return Cj
+
+    def derivative(self, p, j, x):
         """
+        Evaluate derivatives of a basis element.
+
+        Parameters
+        ----------
         p : int
             Derivative order
-        n : int
-            Degree / basis index
-        i : int
-            Grid index
+        j : int
+            Basis element index
+        x : array of floats
+            Locations for evaluation
 
         """
 
-        if index:
-            i = x
-        else:
+        if x is not self.grid:
             raise NotImplementedError("Evaluation only implemented on grid points.")
 
-        N = self.N
+        if p != 1:
+            raise ValueError("Higher order derivatives not implemented.")
+
+        N = self.size - 1
+        i = np.arange(N + 1)
         xj = self.grid[j]
-        xi = self.grid[i]
 
-        # First derivative
-        if i == j:
-            if i == 0:
-                Cj_x = (1. + 2.*N**2) / 6.
-            elif i == N:
-                Cj_x = -(1. + 2.*N**2) / 6.
-            else:
-                Cj_x = -xj / (2. * (1. - xj**2))
+        # i != j, avoiding divide-by-zero
+        dx = x - xj
+        dx[j] = 1.
+        Cj_x = (-1) ** (i + j) / dx
+        Cj_x[0] *= 2.
+        Cj_x[N] *= 2.
+        if (j == 0) or (j == N):
+            Cj_x /= 2.
+
+        # i == j
+        if j == 0:
+            Cj_x[j] = (1. + 2.*N**2) / 6.
+        elif j == N:
+            Cj_x[j] = -(1. + 2.*N**2) / 6.
         else:
-            pi = pj = 1.
-            if (pi == 0) or (pi == N):
-                pi = 2.
-            if (pj == 0) or (pj == N):
-                pj = 2.
-            Cj_x = (-1) ** (i + j) * pi / (pj * (xi - xj))
-        if p == 1:
-            return Cj_x
+            Cj_x[j] = -xj / (2. * (1. - xj**2))
 
-        # Higher derivatives
-        raise ValueError("Higher order derivatives not implemented.")
+        return Cj_x
 
     def diffmatrix(self, p):
+        """
+        Construct p-th order differentiation matrix.
 
+        Parameters
+        ----------
+        p : int
+            Derivative order
+
+        """
+
+        # Construct higher derivative matrices through matrix multiplication
         D1 = self._construct_diff_matrix(1)
         Dp = np.identity(self.size)
         for i in xrange(p):
             Dp = np.dot(D1, Dp)
+
         return Dp
 
 
 class ChebyshevRootsCardinals(_BasisBase):
-    pass
+    """Chebyshev cardinal basis on the roots grid."""
+
+    _poly_basis_class = ChebyshevRootsPolynomials
+
+    def _evaluate_off_grid(self, j, x):
+
+        N = self.size
+        xj = self.grid[j]
+
+        # Mask singularity at xj
+        dx = x - xj
+        singmask = np.where(dx == 0)
+        dx[singmask] = 1.
+        TN_x = self.basis.evaluate(N, x)
+        TN_x_xj = self.basis.derivative(1, N, xj)
+        Cj = TN_x / TN_x_xj / dx
+        Cj[singmask] = 1.
+
+        return Cj
+
+    def derivative(self, p, j, x):
+        """
+        Evaluate derivatives of a basis element.
+
+        Parameters
+        ----------
+        p : int
+            Derivative order
+        j : int
+            Basis element index
+        x : array of floats
+            Locations for evaluation
+
+        """
+
+        if x is not self.grid:
+            raise NotImplementedError("Evaluation only implemented on grid points.")
+
+        N = self.size
+        i = np.arange(N)
+        xj = self.grid[j]
+
+        # Avoid divide-by-zeros
+        dx = x - xj
+        dx[j] = 1.
+
+        # First derivative
+        scratch = np.sqrt((1. - xj**2) / (1. - x**2))
+        Cj_x = (-1) ** (i + j) * scratch / dx
+        Cj_x[j] = 0.5 * xj / (1. - xj**2)
+
+        if p == 1:
+            return Cj_x
+
+        # Second derivative
+        Cj_xx = Cj_x * (x / (1. - x**2) - 2. / dx)
+        Cj_xx[j] = xj**2 / (1. - xj**2)**2 - (N**2 - 1.) / (3. * (1. - xj**2))
+
+        if p == 2:
+            return Cj_xx
+
+        # Higher derivatives
+        raise ValueError("Higher order derivatives not implemented.")
 

@@ -10,6 +10,25 @@ import numpy as np
 import scipy.linalg as linalg
 
 
+class _ProblemBase(object):
+    """Problem solver base class."""
+
+    def __init__(self, varlist):
+
+        # Store inputs
+        self.varlist = varlist
+        self.syssize = np.sum([var.size for var in self.varlist])
+
+        # Copy variable coefficients
+        self.syscoeff = np.concatenate([var.coefficients for var in self.varlist])
+
+        # Make variable attributes views into the problem vector
+        start = 0
+        for var in self.varlist:
+            var.coefficients = self.syscoeff[start:start+var.size]
+            start += var.size
+
+
 class BoundaryValueProblem(object):
     """Linear boundary value problem solver."""
 
@@ -26,11 +45,10 @@ class BoundaryValueProblem(object):
 
         """
 
-        # Store inputs
-        self.varlist = varlist
+        # Inherited initialization
+        _ProblemBase.__init__(self, varlist)
 
         # Construct matrices
-        self.syssize = np.sum([var.size for var in self.varlist])
         self.LHS = np.zeros((self.syssize, self.syssize))
         self.RHS = np.zeros(self.syssize)
 
@@ -38,9 +56,9 @@ class BoundaryValueProblem(object):
         """Solve the BVP using a matrix solve."""
 
         # Matrix solve
-        u = linalg.solve(a=self.LHS, b=self.RHS)
+        self.syscoeff[:] = linalg.solve(a=self.LHS, b=self.RHS)
 
-        return u
+        return self.varlist
 
 
 class EigenProblem(object):
@@ -59,11 +77,10 @@ class EigenProblem(object):
 
         """
 
-        # Store inputs
-        self.varlist = varlist
+        # Inherited initialization
+        _ProblemBase.__init__(self, varlist)
 
         # Construct matrices
-        self.syssize = np.sum([var.size for var in self.varlist])
         self.LHS = np.zeros((self.syssize, self.syssize))
         self.RHS = np.identity(self.syssize)
 
