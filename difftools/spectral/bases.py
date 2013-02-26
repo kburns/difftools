@@ -203,7 +203,7 @@ class _CardinalBase(_BasisBase):
         # Store inputs
         self.size = size
 
-        # Construct poly basis object
+        # Construct polynomial basis object
         self.poly_basis = self._poly_basis_class(size)
 
         # Construct collocation grid
