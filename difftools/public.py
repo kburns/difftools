@@ -10,7 +10,8 @@ from spectral.bases import (ChebyshevExtremaPolynomials,
                             ChebyshevExtremaCardinals,
                             ChebyshevRootsPolynomials,
                             ChebyshevRootsCardinals)
-from spectral.recombined_bases import DirichletChebyshevExtremaPolynomials
+from spectral.recombined_bases import (DirichletChebyshevExtremaPolynomials,
+                                       DoubleNeumannChebyshevExtremaPolynomials)
 from spectral.series import TruncatedSeries
 from solvers import BoundaryValueProblem, EigenProblem
 
