@@ -49,6 +49,36 @@ class _ProblemBase(object):
 
         self.LHS[S1:S1+N1, S2:S2+N2] += array
 
+    def set_dirichlet_bc(self, var, x, value):
+
+        if x not in var.basis.grid:
+            raise ValueError("Boundary condition must be specified on a grid point.")
+
+        i = np.where(var.basis.grid == x)[0][0]
+        evalrow = var.basis.evalmatrix(var.basis.grid)[i]
+
+        start = self.varstart[var]
+        row = start + i
+
+        self.LHS[row] = 0.
+        self.LHS[row, start:start+var.size] = evalrow
+        self.RHS[row] = value
+
+    def set_neumann_bc(self, var, x, value):
+
+        if x not in var.basis.grid:
+            raise ValueError("Boundary condition must be specified on a grid point.")
+
+        i = np.where(var.basis.grid == x)[0][0]
+        diffrow = var.basis.diffmatrix(1, var.basis.grid)[i]
+
+        start = self.varstart[var]
+        row = start + i
+
+        self.LHS[row] = 0.
+        self.LHS[row, start:start+var.size] = diffrow
+        self.RHS[row] = value
+
 
 class BoundaryValueProblem(_ProblemBase):
     """Linear boundary value problem solver."""
@@ -117,4 +147,18 @@ class EigenProblem(_ProblemBase):
         eigvecs = eigvecs[:, sorter].T
 
         return (eigvals, eigvecs)
+
+    def set_dirichlet_bc(self, var, x, value):
+
+        if value != 0:
+            raise NotImplementedError("Non-homogeneous Dirichlet BC not implemented.")
+
+        _ProblemBase.set_dirichlet_bc(self, var, x, value)
+
+    def set_neumann_bc(self, var, x, value):
+
+        if value != 0:
+            raise NotImplementedError("Non-homogeneous Neumann BC not implemented.")
+
+        _ProblemBase.set_neumann_bc(self, var, x, value)
 
