@@ -6,7 +6,8 @@ Author: Keaton J. Burns <keaton.burns@gmail.com>
 """
 
 
-import bases
+import polynomial_bases
+import cardinal_bases
 import recombined_bases
 import series
 

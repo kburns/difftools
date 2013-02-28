@@ -1,3 +1,9 @@
+"""
+Recombined basis sets.
+
+Author: Keaton J. Burns <keaton.burns@gmail.com>
+
+"""
 
 
 import numpy as np
