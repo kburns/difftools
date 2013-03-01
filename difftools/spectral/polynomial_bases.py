@@ -29,14 +29,6 @@ class _BasisBase(object):
         # Construct collocation grid
         self.grid = self._construct_grid()
 
-    def _construct_diff_matrix(self, p, x):
-
-        Dp = np.empty((self.size, x.size))
-        for j in xrange(self.size):
-            Dp[j] = self.derivative(p, j, x)
-
-        return Dp.T
-
     def diffmatrix(self, p, x):
         """
         Construct p-th order differentiation matrix.
@@ -50,7 +42,11 @@ class _BasisBase(object):
 
         """
 
-        return self._construct_diff_matrix(p, x)
+        Dp = np.empty((self.size, x.size))
+        for j in xrange(self.size):
+            Dp[j] = self.derivative(p, j, x)
+
+        return Dp.T
 
     def evalmatrix(self, x):
         """

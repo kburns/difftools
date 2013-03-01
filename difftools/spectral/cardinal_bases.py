@@ -138,8 +138,13 @@ class ChebyshevExtremaCardinals(_CardinalBase):
 
         """
 
+        # First derivative
+        D1 = np.empty((self.size, x.size))
+        for j in xrange(self.size):
+            D1[j] = self.derivative(1, j, x)
+        D1 = D1.T
+
         # Construct higher derivative matrices through matrix multiplication
-        D1 = self._construct_diff_matrix(1, x)
         Dp = np.identity(self.size)
         for i in xrange(p):
             Dp = np.dot(D1, Dp)
