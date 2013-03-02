@@ -8,6 +8,8 @@ Solve
     F_z(-1) = 0
     F_z(1) = 0
 
+    G = F_z / K
+
 """
 
 
@@ -16,26 +18,30 @@ from difftools.public import *
 
 
 # Setup
-#basis = DoubleNeumannChebyshevExtremaPolynomials(100)
-basis = ChebyshevExtremaCardinals(500)
-F = TruncatedSeries(basis)
+n_points = 500
+DNCEP = DoubleNeumannChebyshevExtremaPolynomials(n_points)
+F = TruncatedSeries(DNCEP)
 EP = EigenProblem([F])
 
+# Stratification
 H = 1.
 m = 3. / 2.
 h = lambda z: (1 - (z/H)**2) ** m
 
 # Operators
-EP.LHS = basis.diffmatrix(2, basis.grid)
-EP.RHS = basis.evalmatrix(basis.grid) * np.array([h(basis.grid)]).T
-
-# Boundary conditions
-EP.set_neumann_bc(F, -1., 0.)
-EP.set_neumann_bc(F, 1., 0.)
+EP.LHS = F.basis.diffmatrix(2, F.basis.grid)
+EP.RHS = F.basis.evalmatrix(F.basis.grid) * np.array([h(F.basis.grid)]).T
 
 # Solve
-eigvals, eigfuncs = EP.solve()
+eigvals, eigvecs = EP.solve()
 
 # Convert eigenvalues
 K = np.sqrt(-eigvals)
+
+# Construct eigenfunctions
+eigF = []
+for i in xrange(eigvals.size):
+    Fi = TruncatedSeries(DNCEP)
+    Fi.coefficients = eigfuncs[i]
+    eigF.append(Fi)
 

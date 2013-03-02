@@ -49,6 +49,31 @@ class _ProblemBase(object):
 
         self.LHS[S1:S1+N1, S2:S2+N2] += array
 
+    def LHS_block(self, var1, var2):
+
+        S1 = self.varstart[var1]
+        S2 = self.varstart[var2]
+        N1 = var1.size
+        N2 = var2.size
+
+        subblock = self.LHS[S1:S1+N1, S2:S2+N2]
+
+        return subblock
+
+    def RHS_block(self, var1, var2=None):
+
+        S1 = self.varstart[var1]
+        N1 = var1.size
+
+        subblock = self.RHS[S1:S1+N1]
+
+        if var2:
+            S2 = self.varstart[var2]
+            N2 = var2.size
+            subblock = subblock[:, S2:S2+N2]
+
+        return subblock
+
     def set_dirichlet_bc(self, var, x, value):
 
         if x not in var.basis.grid:
@@ -133,7 +158,7 @@ class EigenProblem(_ProblemBase):
 
         # Construct matrices
         self.LHS = np.zeros((self.syssize, self.syssize))
-        self.RHS = np.identity(self.syssize)
+        self.RHS = np.zeros((self.syssize, self.syssize))
 
     def solve(self):
         """Solve the generalized eigenproblem."""

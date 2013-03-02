@@ -31,7 +31,7 @@ EP.set_dirichlet_bc(y, -1., 0.)
 EP.set_dirichlet_bc(y, 1., 0.)
 
 # Solve
-eigvals, eigfuncs = EP.solve()
+eigvals, eigvecs = EP.solve()
 
 # Convert eigenvalues
 L = np.sqrt(-eigvals)
