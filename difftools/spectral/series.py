@@ -69,6 +69,23 @@ class TruncatedSeries(object):
 
         return out
 
+    def expand_points(self, arr):
+        """
+        Expand a functioned as evaluated at grid points.
+
+        Parameters
+        ----------
+        arr : array of floats
+            Function evaluated over basis grid.
+
+        """
+
+        LHS = self.basis.evalmatrix(self.basis.grid)
+        RHS = arr
+
+        self.coefficients[:] = linalg.solve(a=LHS, b=RHS)
+
+
     def expand_function(self, f):
         """
         Expand a function as evaluated at grid points.
@@ -80,8 +97,7 @@ class TruncatedSeries(object):
 
         """
 
-        LHS = self.basis.evalmatrix(self.basis.grid)
-        RHS = f(self.basis.grid)
+        arr = f(self.basis.grid)
 
-        self.coefficients[:] = linalg.solve(a=LHS, b=RHS)
+        self.expand_points(arr)
 
