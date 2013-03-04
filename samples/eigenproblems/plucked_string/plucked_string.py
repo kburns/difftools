@@ -1,7 +1,5 @@
 """
-Test eigenproblem: frequencies of a plucked string.
-
-Solve
+Compute eigenfrequencies of a plucked string:
 
     u_xx = - L**2 * u
 

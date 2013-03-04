@@ -1,24 +1,26 @@
 """
-Compute eigenfrequencies of a plucked string:
+Compute MRI channel modes in a vertically stratified polytropic accretion disc:
 
-    u_xx = - L**2 * u
+    F_zz = - K**2 * h(z) * F
+    h(z) = (1 - (z/H)**2) ** m
+    G = F_z / K
 
-    u(-1) = 0
-    u(1) = 0
+    F_z(-1) = 0
+    F_z(1) = 0
 
 """
 
 
 import numpy as np
 import matplotlib.pyplot as plt
-import plucked_string
+import stratified_mri
 
 
 # Solve at two resolutions
-s1 = 16
+s1 = 128
 s2 = 32
-(L1, ev1, ef1) = plucked_string.main(s1)
-(L2, ev2, ef2) = plucked_string.main(s2)
+(L1, ev1, ef1) = mri.main(s1, m=1)
+(L2, ev2, ef2) = mri.main(s2)
 
 # Compare to expected eigenvalues
 ex1 = -(np.arange(1, ev1.size+1) * np.pi / 2.) ** 2

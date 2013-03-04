@@ -1,7 +1,5 @@
 """
-Test eigenproblem: frequencies of a plucked string.
-
-Solve
+Compute MRI channel modes in a vertically stratified polytropic accretion disc:
 
     F_zz = - K**2 * h(z) * F
     h(z) = (1 - (z/H)**2) ** m
