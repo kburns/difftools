@@ -34,72 +34,105 @@ class _ProblemBase(object):
             N = var.size
             var.coefficients = self.syscoeff[S:S+N]
 
-    def add_to_LHS(self, var1, var2, array):
-        """
-        var1        evaluation on var1 grid
-        var2        evaluation of var2 basis
-        array       array to add
-
-        """
-
-        S1 = self.varstart[var1]
-        S2 = self.varstart[var2]
-        N1 = var1.size
-        N2 = var2.size
-
-        self.LHS[S1:S1+N1, S2:S2+N2] += array
-
     def LHS_block(self, var1, var2):
+        """
+        Return subblock of LHS.
 
-        S1 = self.varstart[var1]
-        S2 = self.varstart[var2]
-        N1 = var1.size
-        N2 = var2.size
+        Parameters
+        ----------
+        var1 : variable/series object
+            Pick rows specifying var1 values/coefficients.
+        var2 : variable/series object
+            Pick columns depending on var2 values/coefficients.
 
-        subblock = self.LHS[S1:S1+N1, S2:S2+N2]
+        """
+
+        s1 = self.varstart[var1]
+        s2 = self.varstart[var2]
+        n1 = var1.size
+        n2 = var2.size
+        subblock = self.LHS[s1:s1+n1, s2:s2+n2]
 
         return subblock
 
     def RHS_block(self, var1, var2=None):
+        """
+        Return subblock of RHS.
 
-        S1 = self.varstart[var1]
-        N1 = var1.size
+        Parameters
+        ----------
+        var1 : variable/series object
+            Pick rows specifying var1 values/coefficients.
+        var2 : variable/series object, optional
+            Pick columns depending on var2 values/coefficients, if RHS is 2-dimensional.
 
-        subblock = self.RHS[S1:S1+N1]
+        """
+
+        s1 = self.varstart[var1]
+        n1 = var1.size
+        subblock = self.RHS[s1:s1+n1]
 
         if var2:
-            S2 = self.varstart[var2]
-            N2 = var2.size
-            subblock = subblock[:, S2:S2+N2]
+            s2 = self.varstart[var2]
+            n2 = var2.size
+            subblock = subblock[:, s2:s2+n2]
 
         return subblock
 
     def set_dirichlet_bc(self, var, x, value):
+        """
+        Implement a Dirichlet boundary condition using boundary bordering.
+
+        Parameters
+        ----------
+        var : variable/series object
+            Applicable variable
+        x : float
+            Location where BC is specified.
+        value : float
+            Value of var at x
+
+        """
 
         if x not in var.basis.grid:
             raise ValueError("Boundary condition must be specified on a grid point.")
 
+        # Get x evaluation row
         i = np.where(var.basis.grid == x)[0][0]
         evalrow = var.basis.evalmatrix(var.basis.grid)[i]
 
+        # Repalce x equation with BC
         start = self.varstart[var]
         row = start + i
-
         self.LHS[row] = 0.
         self.LHS[row, start:start+var.size] = evalrow
         self.RHS[row] = value
 
     def set_neumann_bc(self, var, x, value):
+        """
+        Implement a Neumann boundary condition using boundary bordering.
+
+        Parameters
+        ----------
+        var : variable/series object
+            Applicable variable
+        x : float
+            Location where BC is specified.
+        value : float
+            First derivative of var at x
+
+        """
 
         if x not in var.basis.grid:
             raise ValueError("Boundary condition must be specified on a grid point.")
 
+        # Get x derivative row
         i = np.where(var.basis.grid == x)[0][0]
         diffrow = var.basis.diffmatrix(1, var.basis.grid)[i]
 
+        # Replace x equation with BC
         start = self.varstart[var]
         row = start + i
-
         self.LHS[row] = 0.
         self.LHS[row, start:start+var.size] = diffrow
         self.RHS[row] = value
@@ -116,8 +149,8 @@ class BoundaryValueProblem(_ProblemBase):
 
         Parameters
         ----------
-        varlist : list of series objects
-            Variables in system.
+        varlist : list of variable/series objects
+            Variables in system
 
         """
 
@@ -142,14 +175,14 @@ class EigenProblem(_ProblemBase):
 
     def __init__(self, varlist):
         """
-        Setup the eigenvalue problem
+        Setup the generalized eigenvalue problem
 
             LHS . u = eigval * RHS . u
 
         Parameters
         ----------
-        varlist : list of series objects
-            Variables in system.
+        varlist : list of variable/series objects
+            Variables in system
 
         """
 
@@ -174,16 +207,46 @@ class EigenProblem(_ProblemBase):
         return (eigvals, eigvecs)
 
     def set_dirichlet_bc(self, var, x, value):
+        """
+        Implement a Dirichlet boundary condition using boundary bordering.
 
+        Parameters
+        ----------
+        var : variable/series object
+            Applicable variable
+        x : float
+            Location where BC is specified.
+        value : float
+            Value of var at x
+
+        """
+
+        # Check homogeneity
         if value != 0:
             raise NotImplementedError("Non-homogeneous Dirichlet BC not implemented.")
 
+        # Inherited method
         _ProblemBase.set_dirichlet_bc(self, var, x, value)
 
     def set_neumann_bc(self, var, x, value):
+        """
+        Implement a Neumann boundary condition using boundary bordering.
 
+        Parameters
+        ----------
+        var : variable/series object
+            Applicable variable
+        x : float
+            Location where BC is specified.
+        value : float
+            First derivative of var at x
+
+        """
+
+        # Check homogeneity
         if value != 0:
             raise NotImplementedError("Non-homogeneous Neumann BC not implemented.")
 
+        # Inherited method
         _ProblemBase.set_neumann_bc(self, var, x, value)
 

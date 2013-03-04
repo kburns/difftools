@@ -19,8 +19,8 @@ from difftools.public import *
 
 # Setup
 n_points = 500
-DNCEP = DoubleNeumannChebyshevExtremaPolynomials(n_points)
-F = TruncatedSeries(DNCEP)
+basis = DoubleNeumannChebyshevExtremaPolynomials(n_points)
+F = TruncatedSeries(basis)
 EP = EigenProblem([F])
 
 # Stratification
@@ -29,8 +29,8 @@ m = 3. / 2.
 h = lambda z: (1 - (z/H)**2) ** m
 
 # Operators
-EP.LHS = F.basis.diffmatrix(2, F.basis.grid)
-EP.RHS = F.basis.evalmatrix(F.basis.grid) * np.array([h(F.basis.grid)]).T
+EP.LHS = basis.diffmatrix(2, basis.grid)
+EP.RHS = basis.evalmatrix(basis.grid) * np.array([h(basis.grid)]).T
 
 # Solve
 eigvals, eigvecs = EP.solve()
@@ -41,7 +41,7 @@ K = np.sqrt(-eigvals)
 # Construct eigenfunctions
 eigF = []
 for i in xrange(eigvals.size):
-    Fi = TruncatedSeries(DNCEP)
+    Fi = TruncatedSeries(basis)
     Fi.coefficients = eigfuncs[i]
     eigF.append(Fi)
 
