@@ -1,10 +1,10 @@
 """
 Compute eigenfrequencies of a plucked string:
 
-    u_xx = - L**2 * u
+    y_xx = - L**2 * y
 
-    u(-1) = 0
-    u(1) = 0
+    y(-1) = 0
+    y(1) = 0
 
 """
 
@@ -13,7 +13,7 @@ import numpy as np
 from difftools.public import *
 
 
-def main(res=128):
+def plucked_string(res=256):
 
     # Setup
     basis = DoubleDirichletChebyshevExtremaPolynomials(res)

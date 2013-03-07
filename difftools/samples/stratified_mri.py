@@ -1,21 +1,34 @@
-"""
-Compute MRI channel modes in a vertically stratified polytropic accretion disc:
-
-    F_zz = - K**2 * h(z) * F
-    h(z) = (1 - (z/H)**2) ** m
-    G = F_z / K
-
-    F_z(-1) = 0
-    F_z(1) = 0
-
-"""
 
 
 import numpy as np
 from difftools.public import *
 
 
-def main(res = 512, m=3./2.):
+def stratified_mri(res=256, m=3./2.):
+    """
+    Compute MRI channel mode velocities in a vertically stratified polytropic
+    accretion disc.
+
+    Parameters
+    ----------
+    res : int
+        Number of grid points
+    m : float
+        Polytropic index
+
+    Notes
+    -----
+    Equations:
+        F_zz = - K**2 * h(z) * F
+        h(z) = (1 - (z/H)**2) ** m
+
+        F_z(-1) = 0
+        F_z(1) = 0
+
+    Following:
+        Latter, H. N., Fromang, S., Gressel, O., 2010. MNRAS, 406, 848.
+
+    """
 
     # Setup
     basis = DoubleNeumannChebyshevExtremaPolynomials(res)
