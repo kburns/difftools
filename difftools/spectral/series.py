@@ -13,7 +13,7 @@ import scipy.linalg as linalg
 class TruncatedSeries(object):
     """Truncated series class."""
 
-    def __init__(self, basis):
+    def __init__(self, basis, range=(-1., 1.)):
         """
         An object representing a function as a truncated series.
 
@@ -21,6 +21,8 @@ class TruncatedSeries(object):
         ----------
         basis : basis object
             Spectral basis for representation
+        range : tuple of floats
+            Problem domain.
 
         """
 
