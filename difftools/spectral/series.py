@@ -31,6 +31,13 @@ class TruncatedSeries(object):
         self.size = self.basis.size
         self.coefficients = np.zeros(self.size)
 
+        # Transform to problem grid
+        self._grid_scale = (range[1] - range[0]) / 2.
+        self._grid_shift = (range[1] + range[0]) / 2.
+        self._basis_coord = lambda x: (x - self._grid_shift) / self._grid_scale
+        self._problem_coord = lambda x: self._grid_shift + x * self._grid_scale
+        self.grid = self._problem_coord(basis.grid)
+
     def evaluate(self, x):
         """
         Evaluate series.
@@ -41,6 +48,8 @@ class TruncatedSeries(object):
             Locations for evaluation
 
         """
+
+        x = self._basis_coord(x)
 
         # Add terms in series
         out = np.zeros_like(x)
@@ -61,6 +70,8 @@ class TruncatedSeries(object):
             Locations for evaluation
 
         """
+
+        x = self._basis_coord(x)
 
         # Add terms in series
         out = np.zeros_like(x)
@@ -85,7 +96,6 @@ class TruncatedSeries(object):
 
         self.coefficients[:] = linalg.solve(a=LHS, b=RHS)
 
-
     def expand_function(self, f):
         """
         Expand a function as evaluated at grid points.
@@ -97,7 +107,21 @@ class TruncatedSeries(object):
 
         """
 
-        arr = f(self.basis.grid)
+        x = self._problem_coord(self.basis.grid)
+        arr = f(x)
 
         self.expand_points(arr)
+
+    def evalmatrix(self, series):
+
+        E = self.basis.evalmatrix(series.basis.grid)
+
+        return E
+
+    def diffmatrix(self, p, series):
+
+        D = self.basis.evalmatrix(p, series.basis.grid)
+        D /= self._grid_scale
+
+        return D
 

@@ -94,11 +94,11 @@ class _ProblemBase(object):
 
         """
 
-        if x not in var.basis.grid:
+        if x not in var.grid:
             raise ValueError("Boundary condition must be specified on a grid point.")
 
         # Get x evaluation row
-        i = np.where(var.basis.grid == x)[0][0]
+        i = np.where(var.grid == x)[0][0]
         evalrow = var.basis.evalmatrix(var.basis.grid)[i]
 
         # Repalce x equation with BC
@@ -123,11 +123,11 @@ class _ProblemBase(object):
 
         """
 
-        if x not in var.basis.grid:
+        if x not in var.grid:
             raise ValueError("Boundary condition must be specified on a grid point.")
 
         # Get x derivative row
-        i = np.where(var.basis.grid == x)[0][0]
+        i = np.where(var.grid == x)[0][0]
         diffrow = var.basis.diffmatrix(1, var.basis.grid)[i]
 
         # Replace x equation with BC
