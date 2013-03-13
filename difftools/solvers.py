@@ -30,9 +30,9 @@ class _ProblemBase(object):
 
         # Make variable attributes views into the system array
         for var in self.varlist:
-            S = self.varstart[var]
-            N = var.size
-            var.coefficients = self.syscoeff[S:S+N]
+            start = self.varstart[var]
+            end = start + var.size
+            var.coefficients = self.syscoeff[start:end]
 
     def LHS_block(self, var1, var2):
         """
@@ -47,11 +47,11 @@ class _ProblemBase(object):
 
         """
 
-        s1 = self.varstart[var1]
-        s2 = self.varstart[var2]
-        n1 = var1.size
-        n2 = var2.size
-        subblock = self.LHS[s1:s1+n1, s2:s2+n2]
+        start1 = self.varstart[var1]
+        start2 = self.varstart[var2]
+        end1 = start1 + var1.size
+        end2 = start2 + var2.size
+        subblock = self.LHS[start1:end1, start2:end2]
 
         return subblock
 
@@ -68,14 +68,14 @@ class _ProblemBase(object):
 
         """
 
-        s1 = self.varstart[var1]
-        n1 = var1.size
-        subblock = self.RHS[s1:s1+n1]
+        start1 = self.varstart[var1]
+        end1 = start1 + var1.size
+        subblock = self.RHS[start1:end1]
 
         if var2:
-            s2 = self.varstart[var2]
-            n2 = var2.size
-            subblock = subblock[:, s2:s2+n2]
+            start2 = self.varstart[var2]
+            end2 = start2 + var2.size
+            subblock = subblock[:, start2:end2]
 
         return subblock
 
@@ -103,9 +103,10 @@ class _ProblemBase(object):
 
         # Repalce x equation with BC
         start = self.varstart[var]
+        end = start + var.size
         row = start + i
         self.LHS[row] = 0.
-        self.LHS[row, start:start+var.size] = evalrow
+        self.LHS[row, start:end] = evalrow
         self.RHS[row] = value
 
     def set_neumann_bc(self, var, x, value):
@@ -132,9 +133,10 @@ class _ProblemBase(object):
 
         # Replace x equation with BC
         start = self.varstart[var]
+        end = start + var.size
         row = start + i
         self.LHS[row] = 0.
-        self.LHS[row, start:start+var.size] = diffrow
+        self.LHS[row, start:end] = diffrow
         self.RHS[row] = value
 
 
@@ -158,8 +160,8 @@ class BoundaryValueProblem(_ProblemBase):
         _ProblemBase.__init__(self, varlist)
 
         # Construct matrices
-        self.LHS = np.zeros((self.syssize, self.syssize))
-        self.RHS = np.zeros(self.syssize)
+        self.LHS = np.zeros((self.syssize, self.syssize), dtype=np.complex128)
+        self.RHS = np.zeros(self.syssize, dtype=np.complex128)
 
     def solve(self):
         """Solve the BVP using a matrix solve."""
@@ -190,8 +192,8 @@ class EigenProblem(_ProblemBase):
         _ProblemBase.__init__(self, varlist)
 
         # Construct matrices
-        self.LHS = np.zeros((self.syssize, self.syssize))
-        self.RHS = np.zeros((self.syssize, self.syssize))
+        self.LHS = np.zeros((self.syssize, self.syssize), dtype=np.complex128)
+        self.RHS = np.zeros((self.syssize, self.syssize), dtype=np.complex128)
 
     def solve(self):
         """Solve the generalized eigenproblem."""
@@ -202,7 +204,7 @@ class EigenProblem(_ProblemBase):
         # Sort by eigenvalue
         sorter = np.argsort(np.abs(eigvals))
         eigvals = eigvals[sorter]
-        eigvecs = eigvecs[:, sorter].T
+        eigvecs = eigvecs.T[sorter]
 
         return (eigvals, eigvecs)
 
