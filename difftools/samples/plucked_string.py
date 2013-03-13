@@ -13,16 +13,16 @@ import numpy as np
 from difftools.public import *
 
 
-def plucked_string(res=256):
+def plucked_string(res=256, range=(-1., 1.)):
 
     # Setup
     basis = DoubleDirichletChebyshevExtremaPolynomials(res)
-    y = TruncatedSeries(basis)
+    y = TruncatedSeries(basis, range=range)
     EP = EigenProblem([y])
 
     # Operators
-    EP.LHS = basis.diffmatrix(2, basis.grid)
-    EP.RHS = basis.evalmatrix(basis.grid)
+    EP.LHS = y.diffmatrix(2, y)
+    EP.RHS = y.evalmatrix(y)
 
     # Solve
     eigvals, eigvecs = EP.solve()
@@ -33,7 +33,7 @@ def plucked_string(res=256):
     # Construct eigenfunctions
     eigfuncs = []
     for i in xrange(eigvals.size):
-        ef_i = TruncatedSeries(basis)
+        ef_i = TruncatedSeries(basis, range=range)
         ef_i.coefficients = eigvecs[i]
         eigfuncs.append(ef_i)
 

@@ -40,8 +40,8 @@ def stratified_mri(res=256, m=3./2.):
     h = lambda z: (1 - (z/H)**2) ** m
 
     # Operators
-    EP.LHS = basis.diffmatrix(2, basis.grid)
-    EP.RHS = basis.evalmatrix(basis.grid) * np.array([h(basis.grid)]).T
+    EP.LHS = F.diffmatrix(2, F)
+    EP.RHS = F.evalmatrix(F) * np.array([h(F.grid)]).T
 
     # Solve
     eigvals, eigvecs = EP.solve()
