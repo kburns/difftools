@@ -31,7 +31,7 @@ class TruncatedSeries(object):
 
         # Setup parameters
         self.size = self.basis.size
-        self.coefficients = np.zeros(self.size)
+        self.coefficients = np.zeros(self.size, dtype=np.complex128)
 
         # Transform to problem grid
         self._grid_scale = (range[1] - range[0]) / 2.
@@ -54,7 +54,7 @@ class TruncatedSeries(object):
         x = self._basis_coord(x)
 
         # Add terms in series
-        out = np.zeros_like(x)
+        out = np.zeros_like(x, dtype=np.complex128)
         for j in xrange(self.size):
             out += self.basis.evaluate(j, x) * self.coefficients[j]
 
@@ -76,7 +76,7 @@ class TruncatedSeries(object):
         x = self._basis_coord(x)
 
         # Add terms in series
-        out = np.zeros_like(x)
+        out = np.zeros_like(x, dtype=np.complex128)
         for j in xrange(self.size):
             out += self.basis.derivative(p, j, x) * self.coefficients[j]
 
@@ -114,16 +114,16 @@ class TruncatedSeries(object):
 
         self.expand_points(arr)
 
-    def evalmatrix(self, series):
+    def E(self, series):
 
         E = self.basis.evalmatrix(series.basis.grid)
 
         return E
 
-    def diffmatrix(self, p, series):
+    def D(self, p, series):
 
-        D = self.basis.evalmatrix(p, series.basis.grid)
-        D /= self._grid_scale
+        D = self.basis.diffmatrix(p, series.basis.grid)
+        D /= self._grid_scale ** p
 
         return D
 
