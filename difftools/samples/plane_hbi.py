@@ -4,29 +4,21 @@ import numpy as np
 from difftools.public import *
 
 
-def plane_hbi(res=256, k=250.):
+def plane_hbi(res=250, k=250.):
     """
-    Compute MRI channel mode velocities in a vertically stratified polytropic
-    accretion disc.
+    Compute HBI modes in a plane parallel model of the intracluster medium.
 
     Parameters
     ----------
     res : int
         Number of grid points
-    m : float
-        Polytropic index
+    k : float
+        Horizontal wavenumber
 
     Notes
     -----
-    Equations:
-        F_zz = - K**2 * h(z) * F
-        h(z) = (1 - (z/H)**2) ** m
-
-        F_z(-1) = 0
-        F_z(1) = 0
-
     Following:
-        Latter, H. N., Fromang, S., Gressel, O., 2010. MNRAS, 406, 848.
+        Latter, H. N., Kunz, M., 2012. MNRAS, 423, 1964.
 
     """
 
@@ -40,7 +32,7 @@ def plane_hbi(res=256, k=250.):
     # Variables
     range = (0., 1.)
     r = TruncatedSeries(CEP, range=range)
-    u = TruncatedSeries(CEP, range=range)
+    u = TruncatedSeries(DNCEP, range=range)
     w = TruncatedSeries(DDCEP, range=range)
     T = TruncatedSeries(DDCEP, range=range)
     A = TruncatedSeries(DNCEP, range=range)
@@ -75,7 +67,6 @@ def plane_hbi(res=256, k=250.):
     LHS(r, u)[:] = -1j * k * u.E(r)
     LHS(r, w)[:] = -C1*w.E(r) - w.D(1, r)
     RHS(r, r)[:] = r.E(r)
-    #EP.set_dirichlet_bc(r, 0., 0.)
 
     # x velocity operators
     g = u.grid
