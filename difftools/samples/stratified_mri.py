@@ -37,11 +37,11 @@ def stratified_mri(res=256, m=3./2.):
 
     # Stratification
     H = 1.
-    h = lambda z: (1 - (z/H)**2) ** m
+    h = lambda z: (1. - (z/H)**2) ** m
 
     # Operators
-    EP.LHS = F.diffmatrix(2, F)
-    EP.RHS = F.evalmatrix(F) * np.array([h(F.grid)]).T
+    EP.LHS[:] = F.D(2, F)
+    EP.RHS[:] = F.E(F) * np.array([h(F.grid)]).T
 
     # Solve
     eigvals, eigvecs = EP.solve()
@@ -52,9 +52,9 @@ def stratified_mri(res=256, m=3./2.):
     # Construct eigenfunctions
     eigfuncs = []
     for i in xrange(eigvals.size):
-        ef_i = TruncatedSeries(basis)
-        ef_i.coefficients = eigvecs[i]
-        eigfuncs.append(ef_i)
+        ef = F.duplicate()
+        ef.coefficients = eigvecs[i]
+        eigfuncs.append(ef)
 
     return (K, eigvals, eigfuncs)
 

@@ -22,12 +22,13 @@ class TruncatedSeries(object):
         basis : basis object
             Spectral basis for representation
         range : tuple of floats
-            Problem domain.
+            (start, end) of domain.
 
         """
 
         # Store inputs
         self.basis = basis
+        self.range = range
 
         # Setup parameters
         self.size = self.basis.size
@@ -39,6 +40,14 @@ class TruncatedSeries(object):
         self._basis_coord = lambda x: (x - self._grid_shift) / self._grid_scale
         self._problem_coord = lambda x: self._grid_shift + x * self._grid_scale
         self.grid = self._problem_coord(basis.grid)
+
+    def duplicate(self):
+        """Return a copy series object."""
+
+        copy = self.__class__(self.basis, self.range)
+        copy.coefficients[:] = self.coefficients[:]
+
+        return copy
 
     def evaluate(self, x):
         """
