@@ -124,12 +124,32 @@ class TruncatedSeries(object):
         self.expand_points(arr)
 
     def E(self, series):
+        """
+        Wrapper around basis evalmatrix function.
+
+        Parameters
+        ----------
+        series : series object
+            Series whose basis grid will be used for evaluation points.
+
+        """
 
         E = self.basis.evalmatrix(series.basis.grid)
 
         return E
 
     def D(self, p, series):
+        """
+        Wrapper around basis diffmatrix function.
+
+        Parameters
+        ----------
+        p : int
+            Derivative order
+        series : series object
+            Series whose basis grid will be used for evaluation points.
+
+        """
 
         D = self.basis.diffmatrix(p, series.basis.grid)
         D /= self._grid_scale ** p

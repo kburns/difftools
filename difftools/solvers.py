@@ -99,7 +99,7 @@ class _ProblemBase(object):
 
         # Get x evaluation row
         i = np.where(var.grid == x)[0][0]
-        evalrow = var.basis.evalmatrix(var.basis.grid)[i]
+        evalrow = var.E(var)[i]
 
         # Repalce x equation with BC
         start = self.varstart[var]
@@ -129,7 +129,7 @@ class _ProblemBase(object):
 
         # Get x derivative row
         i = np.where(var.grid == x)[0][0]
-        diffrow = var.basis.diffmatrix(1, var.basis.grid)[i]
+        diffrow = var.D(1, var)[i]
 
         # Replace x equation with BC
         start = self.varstart[var]
