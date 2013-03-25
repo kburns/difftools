@@ -1,0 +1,31 @@
+
+
+Layout of approaches for numerically solving differential equations.
+() : not implemented
+
+
+ode
+    ivp
+        Runge-Kutta
+            explicit
+                regular
+                    RK4
+                embedded
+                    RKCK
+                    RKDP
+                (ETD)
+            (implicit)
+        (multistep)
+    bvp
+        matrix solve
+            spectral
+            (finite difference)
+        (shooting methods)
+pde
+    (bvp)
+    (ivp)
+        (finite difference matrix multiply)
+        (spectral)
+            (matrix multiply)
+            (FFT)
+

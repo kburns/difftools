@@ -1,5 +1,5 @@
 """
-Frameworks for solving various problems in differential equations.
+Matrix solvers for linear BVPs and EPs.
 
 Author: Keaton J. Burns <keaton.burns@gmail.com>
 

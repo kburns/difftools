@@ -1,9 +1,7 @@
-"""
-Public API for difftools package.
 
-Author: Keaton J. Burns <keaton.burns@gmail.com>
 
-"""
+import spectral
+import solvers
 
 
 from spectral.polynomial_bases import (ChebyshevExtremaPolynomials,
@@ -13,5 +11,6 @@ from spectral.cardinal_bases import (ChebyshevExtremaCardinals,
 from spectral.recombined_bases import (DoubleDirichletChebyshevExtremaPolynomials,
                                        DoubleNeumannChebyshevExtremaPolynomials)
 from spectral.series import TruncatedSeries
-from solvers import BoundaryValueProblem, EigenProblem
+from solvers import (BoundaryValueProblem,
+                     EigenProblem)
 
