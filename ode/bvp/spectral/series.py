@@ -88,6 +88,7 @@ class TruncatedSeries(object):
         out = np.zeros_like(x, dtype=np.complex128)
         for j in xrange(self.size):
             out += self.basis.derivative(p, j, x) * self.coefficients[j]
+        out /= self._grid_scale ** p
 
         return out
 
