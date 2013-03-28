@@ -1,7 +1,7 @@
 
 
 import numpy as np
-from difftools.public import *
+from difftools.ode.bvp import *
 
 
 def stratified_mri(res=256, m=3./2.):

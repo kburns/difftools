@@ -23,9 +23,9 @@ ode
         (shooting methods)
 pde
     (bvp)
-    (ivp)
-        (finite difference matrix multiply)
-        (spectral)
+    ivp
+        spectral
+            FFT
             (matrix multiply)
-            (FFT)
+        (finite difference matrix multiply)
 

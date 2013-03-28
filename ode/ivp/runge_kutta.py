@@ -39,14 +39,14 @@ class _ExplicitRungeKutta(object):
             System derivative function
         t0 : float
             Time
-        u0 : array
+        u0 : 1d array
             System
         dt : float
             Time-step
 
         """
 
-        # Copy initial values
+        # Copy initial values, in case f modifies u0
         self._u0[:] = u0
 
         # Calculate stages
@@ -68,7 +68,7 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
 
     def integrate(self, f, t0, u0, dt):
 
-        # Copy initial values
+        # Copy initial values, in case f modifies u0
         self._u0[:] = u0
 
         # Calculate stages

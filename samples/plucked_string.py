@@ -1,7 +1,7 @@
 
 
 import numpy as np
-from difftools.public import *
+from difftools.ode.bvp import *
 
 
 def plucked_string(res=256, range=(-1., 1.)):
