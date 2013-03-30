@@ -71,8 +71,8 @@ class TimeStepper(object):
         self.dt = dt
 
         # Aim for final time
-        if self.model.time + self.dt > self.sim_stop_time:
-            self.dt = self.sim_stop_time - self.model.time
+        if self.model._t + self.dt > self.sim_stop_time:
+            self.dt = self.sim_stop_time - self.model._t
 
         self.iteration += 1
 
