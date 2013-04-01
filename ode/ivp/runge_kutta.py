@@ -42,7 +42,7 @@ class _ExplicitRungeKutta(object):
         u0 : 1d array
             System
         dt : float
-            Time-step
+            Time step
 
         """
 
@@ -67,6 +67,21 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
     """Embedded Runge-Kutta base class."""
 
     def integrate(self, f, t0, u0, dt):
+        """
+        Advance system by one time step.
+
+        Parameters
+        ----------
+        f : function(t, u)
+            System derivative function
+        t0 : float
+            Time
+        u0 : 1d array
+            System
+        dt : float
+            Time step
+
+        """
 
         # Copy initial values, in case f modifies u0
         self._u0[:] = u0

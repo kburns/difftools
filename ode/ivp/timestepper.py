@@ -1,5 +1,5 @@
 """
-Basic timestepping framework.
+Timestepping framework.
 
 Author: Keaton J. Burns <keaton.burns@gmail.com>
 
@@ -11,22 +11,32 @@ import time
 
 
 class TimeStepper(object):
-    """
-    Class for controlling time-evolution of model.
-
-    Model must provide the following methods/attributes:
-    _t : float
-        Time
-    _u : 1d array
-        System
-    _f(t, u) : function
-        Derivative function
-    _stop_condition() : function
-        Halting function
-
-    """
 
     def __init__(self, model, integrator_class):
+        """
+        Timestepper for controlling time-evolution of a model.
+
+        Parameters
+        ----------
+        model : object
+            Model
+        integrator_class : class
+            Integrator class.
+
+        Notes
+        -----
+        The model object must provide the following methods/attributes:
+
+        _t : float
+            Time
+        _u : 1d array
+            System
+        _f(t, u) : function
+            Derivative function
+        _stop_condition() : function
+            Halting function
+
+        """
 
         # Store inputs
         self.model = model
