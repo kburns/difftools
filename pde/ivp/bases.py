@@ -1,36 +1,17 @@
+"""
+Spectral basis sets.
+
+Author: Keaton J. Burns <keaton.burns@gmail.com>
+
+"""
 
 
 import numpy as np
 import scipy.fftpack as fft
 
 
-class ChebyshevSeries(object):
-
-    def __init__(self, size, grid='extrema'):
-
-        # Store inputs
-        self.size = size
-        self.grid = grid
-
-        # Setup tranforms
-        if grid == 'extrema':
-            self.grid = self._extrema_grid()
-            self._fwd = self._extrema_fwd
-            self._bwd = self._extrema_bwd
-        elif grid == 'roots':
-            self.grid = self._roots_grid()
-            self._fwd = self._roots_fwd
-            self._bwd = self._roots_bwd
-        else:
-            raise ValueError("'grid' must be 'extrema' or 'roots'")
-
-        # Setup data containers
-        self.xdata = np.zeros(size)
-        self.kdata = np.zeros(size)
-        self._deriv = np.zeros(size)
-
-        self.current_space = 'xspace'
-        self.data = self.xdata
+class _SpectralBase(object):
+    """Spectral series base class."""
 
     def __getitem__(self, space):
 
@@ -58,6 +39,58 @@ class ChebyshevSeries(object):
                 self.backward()
             else:
                 raise ValueError("space must be 'kspace' or 'xspace'")
+
+    def forward(self):
+
+        if self.current_space == 'kspace':
+            raise ValueError('Cannot go forward from kspace')
+
+        self._fwd()
+        self.data = self.kdata
+        self.current_space = 'kspace'
+
+    def backward(self):
+
+        if self.current_space == 'xspace':
+            raise ValueError('Cannot go backward from xspace')
+
+        self._bwd()
+        self.data = self.xdata
+        self.current_space = 'xspace'
+
+
+class FourierSeries(_SpectralBase):
+    """Fourier series."""
+
+    pass
+
+class ChebyshevSeries(_SpectralBase):
+    """Chebyshev polynomial series."""
+
+    def __init__(self, size, grid='extrema'):
+
+        # Store inputs
+        self.size = size
+
+        # Setup tranforms
+        if grid == 'extrema':
+            self.grid = self._extrema_grid()
+            self._fwd = self._extrema_fwd
+            self._bwd = self._extrema_bwd
+        elif grid == 'roots':
+            self.grid = self._roots_grid()
+            self._fwd = self._roots_fwd
+            self._bwd = self._roots_bwd
+        else:
+            raise ValueError("grid must be 'extrema' or 'roots'")
+
+        # Setup data containers
+        self.xdata = np.zeros(size)
+        self.kdata = np.zeros(size)
+        self._deriv = np.zeros(size)
+
+        self.current_space = 'xspace'
+        self.data = self.xdata
 
     def _extrema_grid(self):
 
@@ -97,24 +130,6 @@ class ChebyshevSeries(object):
 
         self.kdata[1:] /= 2.
         self.xdata[:] = fft.dct(self.kdata, type=3, norm=None)
-
-    def forward(self):
-
-        if self.current_space == 'kspace':
-            raise ValueError('Cannot go forward from kspace')
-
-        self._fwd()
-        self.data = self.kdata
-        self.current_space = 'kspace'
-
-    def backward(self):
-
-        if self.current_space == 'xspace':
-            raise ValueError('Cannot go backward from xspace')
-
-        self._bwd()
-        self.data = self.xdata
-        self.current_space = 'xspace'
 
     def differentiate(self, p):
 

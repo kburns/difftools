@@ -73,6 +73,7 @@ class TimeStepper(object):
         return ok_flag
 
     def advance(self):
+        """Advance system by one time step."""
 
         # Run integrator
         (t1, u1, dt) = self.integrator.integrate(self.model._f,
