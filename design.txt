@@ -4,8 +4,8 @@ Layout of approaches for numerically solving differential equations.
 () : not implemented
 
 
-ode
-    ivp
+ODE
+    IVP
         Runge-Kutta
             explicit
                 regular
@@ -16,16 +16,16 @@ ode
                 (ETD)
             (implicit)
         (multistep)
-    bvp
+    BVP
         matrix solve
             spectral
             (finite difference)
         (shooting methods)
-pde
-    (bvp)
-    ivp
+PDE
+    IVP
         spectral
             FFT
             (matrix multiply)
         (finite difference matrix multiply)
+    (BVP)
 

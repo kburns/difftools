@@ -129,10 +129,7 @@ class ChebyshevSeries(object):
             for i in xrange(N-2, 0, -1):
                 b[i] = 2 * (i+1) * a[i+1] + b[i+2]
             b[0] = a[1] + b[2] / 2.
+            a = b
 
         return b
-
-
-
-
 

@@ -21,6 +21,8 @@ class TimeStepper(object):
         System
     _f(t, u) : function
         Derivative function
+    _stop_condition() : function
+        Halting function
 
     """
 
@@ -43,7 +45,10 @@ class TimeStepper(object):
     @property
     def ok(self):
 
-        if self.model._t >= self.sim_stop_time:
+        if self.model._stop_condition():
+            ok_flag = False
+            print 'Model stop condition satisfied.'
+        elif self.model._t >= self.sim_stop_time:
             ok_flag = False
             print 'Simulation stop time reached.'
         elif (time.time() - self.start_time) >= self.wall_stop_time:
