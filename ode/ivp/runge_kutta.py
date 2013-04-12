@@ -113,6 +113,18 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
             return self.integrate(f, t0, self._u0, new_dt)
 
 
+class Euler(_ExplicitRungeKutta):
+    """First-order forward Euler method."""
+
+    name = 'Euler'
+    order = 1
+
+    # Butcher tableau
+    a = np.array([[0.]])
+    b = np.array([1.])
+    c = np.array([0.])
+
+
 class RK4(_ExplicitRungeKutta):
     """Classic fourth-order Runge-Kutta method."""
 
