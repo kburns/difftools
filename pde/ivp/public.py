@@ -1,5 +1,5 @@
 
 
-from bases import *
-from model import *
+from bases import ChebyshevSeries
+from model import InitialValueProblem
 
