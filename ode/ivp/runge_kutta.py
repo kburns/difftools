@@ -97,9 +97,9 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
         max_error = np.abs(error).max()
 
         # Assume  max_error = C * dt ** (order + 1)
-        # Calculate new_dt such that  max_error = 0.5 * tolerance * new_dt
+        # Calculate new_dt such that  new_max_error = tolerance * new_dt
         C = max_error / dt ** (self.order + 1)
-        new_dt = (0.5 * self.tolerance / C) ** (1. / self.order)
+        new_dt = (self.tolerance / C) ** (1. / self.order)
 
         # Restrict new_dt to reasonable changes
         new_dt = min(max(new_dt, 0.1 * dt), 2 * dt)
