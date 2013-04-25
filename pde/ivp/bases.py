@@ -92,6 +92,17 @@ class ChebyshevExtremaPolynomials(object):
 
         return math2
 
+    def interpolate(self, kdata, x):
+
+        N = self.N
+        theta = np.arccos(x)
+        out = np.zeros_like(x)
+
+        for n in xrange(N + 1):
+            out += kdata[n] * np.cos(n * theta)
+
+        return out
+
 
 class ArcsinMappedCEP(ChebyshevExtremaPolynomials):
 

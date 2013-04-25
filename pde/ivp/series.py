@@ -102,3 +102,9 @@ class TruncatedSeries(object):
 
         return deriv
 
+    def interpolate(self, x):
+
+        xi = self._basis_coord(x)
+        yi = self.basis.interpolate(self['kspace'], xi)
+
+        return yi
