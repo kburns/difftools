@@ -122,7 +122,23 @@ class ArcsinMappedCEP(ChebyshevExtremaPolynomials):
 
     def k_diff(self, kdata, p):
 
-        raise NotImplementedError()
+        k_deriv = self._math1
+        x_deriv = self._math2
+        alpha = self.alpha
+        CG = self._chebyshev_grid
+
+        M = np.sqrt(1 - (alpha * CG)**2) * np.arcsin(alpha) / alpha
+        k_deriv[:] = ChebyshevExtremaPolynomials.k_diff(self, kdata, p)
+        self.backward(k_deriv, x_deriv)
+
+        return x_deriv * M
+
+    def interpolate(self, kdata, x):
+
+     CX = np.sin(np.arcsin(self.alpha) * x) / self.alpha
+     out = ChebyshevExtremaPolynomials.interpolate(self, kdata, x)
+
+     return out
 
 
 @jit(void(double[:], double[:,:], int_))

@@ -28,7 +28,7 @@ class Dirichlet(object):
             c[0] = 2
             c[N] = 2
 
-            self._Ei = np.cos(n * i * np.pi / N)
+            self.Ei = np.cos(n * i * np.pi / N)
             self._update_const = 2 * self.Ei / c / c[i] / N
             self._update = np.zeros(var.size)
 
@@ -47,7 +47,7 @@ class Dirichlet(object):
         kdata = self.var['kspace']
 
         # Calculate update
-        delta_j = self.vi - np.dot(self._Ei, kdata)
+        delta_j = self.vi - np.dot(self.Ei, kdata)
         update[:] = delta_j
         update *= self._update_const
 
