@@ -136,7 +136,7 @@ class ArcsinMappedCEP(ChebyshevExtremaPolynomials):
     def interpolate(self, kdata, x):
 
      CX = np.sin(np.arcsin(self.alpha) * x) / self.alpha
-     out = ChebyshevExtremaPolynomials.interpolate(self, kdata, x)
+     out = ChebyshevExtremaPolynomials.interpolate(self, kdata, CX)
 
      return out
 
