@@ -10,7 +10,7 @@ import numpy as np
 import time
 
 
-class TimeStepper(object):
+class TimeStepper:
 
     def __init__(self, model, integrator_class):
         """
@@ -43,10 +43,9 @@ class TimeStepper(object):
         self.integrator = integrator_class(model._u.size)
 
         # Default parameters
-        self.dt = 0.01
-        self.sim_stop_time = 1.
-        self.wall_stop_time = 60.
-        self.stop_iteration = 100.
+        self.stop_sim_time = 1
+        self.stop_wall_time = 1
+        self.stop_iteration = 1
 
         # Instantiation time
         self.start_time = time.time()
@@ -56,39 +55,35 @@ class TimeStepper(object):
     def ok(self):
 
         if self.model._stop_condition():
-            ok_flag = False
-            print 'Model stop condition satisfied.'
-        elif self.model._t >= self.sim_stop_time:
-            ok_flag = False
-            print 'Simulation stop time reached.'
-        elif (time.time() - self.start_time) >= self.wall_stop_time:
-            ok_flag = False
-            print 'Wall stop time reached.'
+            print('Model stop condition satisfied.')
+            return False
+        elif self.model._t >= self.stop_sim_time:
+            print('Simulation stop time reached.')
+            return False
+        elif (time.time() - self.start_time) >= self.stop_wall_time:
+            print('Wall stop time reached.')
+            return False
         elif self.iteration >= self.stop_iteration:
-            ok_flag = False
-            print 'Stop iteration reached.'
+            print('Stop iteration reached.')
+            return False
         else:
-            ok_flag = True
+            return True
 
-        return ok_flag
-
-    def advance(self):
-        """Advance system by one time step."""
+    def step(self, dt):
+        """Advance system by one iteration/timestep."""
 
         # Run integrator
         (t1, u1, dt) = self.integrator.integrate(self.model._f,
                                                  self.model._t,
                                                  self.model._u,
-                                                 self.dt)
+                                                 dt)
 
         # Update model
         self.model._t = t1
         self.model._u[:] = u1
-        self.dt = dt
 
-        # Aim for final time
-        if self.model._t + self.dt > self.sim_stop_time:
-            self.dt = self.sim_stop_time - self.model._t
-
+        # Update iteration
         self.iteration += 1
+
+        return dt
 

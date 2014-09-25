@@ -9,7 +9,7 @@ Author: Keaton J. Burns <keaton.burns@gmail.com>
 import numpy as np
 
 
-class _ExplicitRungeKutta(object):
+class _ExplicitRungeKutta:
     """Explicit Runge-Kutta base class."""
 
     def __init__(self, system_size, dtype=None):
@@ -50,7 +50,7 @@ class _ExplicitRungeKutta(object):
         self._u0[:] = u0
 
         # Calculate stages
-        for i in xrange(self.c.size):
+        for i in range(self.stages):
             ti = t0 + dt * self.c[i]
             ui = self._u0 + dt * np.dot(self.a[i], self._k)
             self._k[i] = f(ti, ui)
@@ -87,7 +87,7 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
         self._u0[:] = u0
 
         # Calculate stages
-        for i in xrange(self.c.size):
+        for i in range(self.stages):
             ti = t0 + dt * self.c[i]
             ui = self._u0 + dt * np.dot(self.a[i], self._k)
             self._k[i] = f(ti, ui)
@@ -100,9 +100,6 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
         # Calculate new_dt such that  new_max_error = tolerance * new_dt
         C = max_error / dt ** (self.order + 1)
         new_dt = (self.tolerance / C) ** (1. / self.order)
-
-        # Restrict new_dt to reasonable changes
-        new_dt = min(max(new_dt, 0.1 * dt), 2 * dt)
 
         # Calculate step or rerun
         if max_error <= self.tolerance * dt:
@@ -118,6 +115,7 @@ class Euler(_ExplicitRungeKutta):
 
     name = 'Euler'
     order = 1
+    stages = 1
 
     # Butcher tableau
     a = np.array([[0.]])
@@ -130,6 +128,7 @@ class RK4(_ExplicitRungeKutta):
 
     name = 'RK4'
     order = 4
+    stages = 4
 
     # Butcher tableau
     a = np.array([[0.,  0.,  0., 0.],
@@ -145,6 +144,7 @@ class RKCK(_EmbeddedRungeKutta):
 
     name = 'RKCK'
     order = 4
+    stages = 6
 
     # Butcher tableau
     a = np.array([[0., 0., 0., 0., 0., 0.],
@@ -163,6 +163,7 @@ class RKDP(_EmbeddedRungeKutta):
 
     name = 'RKDP'
     order = 4
+    stages = 7
 
     # Butcher tableau
     a = np.array([[0., 0., 0., 0., 0., 0., 0.],
