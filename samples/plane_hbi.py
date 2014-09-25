@@ -1,7 +1,7 @@
 
 
 import numpy as np
-from difftools.ode.bvp import *
+from difftools.ode.bvp.public import *
 
 
 def plane_hbi(res=250, k=250.):
