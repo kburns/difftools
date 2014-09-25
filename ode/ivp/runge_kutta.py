@@ -27,7 +27,7 @@ class _ExplicitRungeKutta(object):
 
         # Allocate arrays for evaluation
         self._u0 = np.zeros(system_size, dtype=dtype)
-        self._k = np.zeros((system_size, self.c.size), dtype=dtype)
+        self._k = np.zeros((self.c.size, system_size), dtype=dtype)
 
     def integrate(self, f, t0, u0, dt):
         """
@@ -52,12 +52,12 @@ class _ExplicitRungeKutta(object):
         # Calculate stages
         for i in xrange(self.c.size):
             ti = t0 + dt * self.c[i]
-            ui = self._u0 + dt * np.dot(self._k, self.a[i])
-            self._k[:, i] = f(ti, ui)
+            ui = self._u0 + dt * np.dot(self.a[i], self._k)
+            self._k[i] = f(ti, ui)
 
         # Calculate step
         t1 = t0 + dt
-        u1 = self._u0 + dt * np.dot(self._k, self.b)
+        u1 = self._u0 + dt * np.dot(self.b, self._k)
         new_dt = dt
 
         return (t1, u1, new_dt)
@@ -89,11 +89,11 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
         # Calculate stages
         for i in xrange(self.c.size):
             ti = t0 + dt * self.c[i]
-            ui = self._u0 + dt * np.dot(self._k, self.a[i])
-            self._k[:, i] = f(ti, ui)
+            ui = self._u0 + dt * np.dot(self.a[i], self._k)
+            self._k[i] = f(ti, ui)
 
         # Calculate error
-        error = dt * np.dot(self._k, self.b_err - self.b)
+        error = dt * np.dot(self.b_err - self.b, self._k)
         max_error = np.abs(error).max()
 
         # Assume  max_error = C * dt ** (order + 1)
@@ -107,7 +107,7 @@ class _EmbeddedRungeKutta(_ExplicitRungeKutta):
         # Calculate step or rerun
         if max_error <= self.tolerance * dt:
             t1 = t0 + dt
-            u1 = self._u0 + dt * np.dot(self._k, self.b)
+            u1 = self._u0 + dt * np.dot(self.b, self._k)
             return (t1, u1, new_dt)
         else:
             return self.integrate(f, t0, self._u0, new_dt)

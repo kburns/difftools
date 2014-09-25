@@ -152,7 +152,7 @@ class ChebyshevExtremaCardinals(_CardinalBase):
         return Dp
 
 
-class ChebyshevRootsCardinals(_BasisBase):
+class ChebyshevRootsCardinals(_CardinalBase):
     """Chebyshev cardinal basis on the roots grid."""
 
     _poly_basis_class = ChebyshevRootsPolynomials
